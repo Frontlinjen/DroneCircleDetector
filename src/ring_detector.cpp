@@ -16,7 +16,7 @@
 #include <image_transport/image_transport.h>
 #include <opencv2/videoio.hpp>
 
-#define BEGIN_SCOPE_MEASURE 1
+#define MEASURE_TIME 1
 
 #ifdef MEASURE_TIME
 #define BEGIN_SCOPE_MEASURE(name)  AutoTimeMeasure mTime(name)
@@ -35,7 +35,7 @@ public:
     }
     ~AutoTimeMeasure(){
         std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
-        ROS_INFO("%s finished in %ins", name, std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count());
+        printf("%s finished in %fs\n", name, std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()/1000000000.0);
     }
 };
 
@@ -55,7 +55,8 @@ void imageCallback(const sensor_msgs::ImageConstPtr & msg)
 {
 	if(sem_trywait(semaphore)!=0)
 		return;
-BEGIN_SCOPE_MEASURE("ImageProcessing");
+
+	BEGIN_SCOPE_MEASURE("ImageProcessing");
 	cv_bridge::CvImageConstPtr imagePtr = cv_bridge::toCvShare(msg);
 	processImage(imagePtr);
 	cv::waitKey(1);
@@ -116,7 +117,6 @@ void processImage( cv_bridge::CvImageConstPtr image)
 	convertScaleAbs( grad_x, abs_grad_x );
 	convertScaleAbs( grad_y, abs_grad_y );
 	cv::Sobel(droneFeed, grad_y, CV_32FC1, 0, 1, 3);
-	cv::imshow("Drone feed", droneFeed);
 	std::vector<cv::Vec3f> circles;
     	double dminDist = minDist / 1.0;
     	double dparam1 = param1 / 1.0;
