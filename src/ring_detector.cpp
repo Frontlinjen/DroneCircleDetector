@@ -12,11 +12,12 @@
 #include <string>
 #include <vector>
 #include <image_transport/image_transport.h>
+const float UPDATE_RATE = 30.0;
 void imageCallback(const sensor_msgs::ImageConstPtr & msg)
 {
-    cv_bridge::CvImageConstPtr image = cv_bridge::toCvShare(msg);
-    cv::imshow("Drone feed", image->image);
-    cv::waitKey(1);
+    cv_bridge::CvImageConstPtr imagePtr = cv_bridge::toCvShare(msg);
+    cv::imshow("Drone feed", imagePtr->image);
+    cv::waitKey(1.0/UPDATE_RATE);
 }
 
 int main(int argc, char ** argv)
@@ -27,6 +28,10 @@ int main(int argc, char ** argv)
     ros::NodeHandle nodeHandle;
 	ImageTransport it(nodeHandle);
     Subscriber sub = it.subscribe("ardrone/front/image_raw", 1, imageCallback);
-    ros::spin();
+    ros::Rate loop_rate(UPDATE_RATE);
+    while(ros::ok()){
+    ros::spinOnce();
+    loop_rate.sleep();
+    }
     return 0;
 }
