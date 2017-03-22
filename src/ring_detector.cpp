@@ -10,28 +10,34 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <image_transport/image_transport.h>
-#include <math.h>
 #include <semaphore.h>
+#include <math.h>
+#include <image_transport/image_transport.h>
+
 const float UPDATE_RATE = 120.0;
+sem_t * semaphore;
 
 int minDist = 10;
 int minRadius = 10;
 int maxRadius = 10;
 int param1 = 30;
 int param2 = 150;
+
 void processImage( cv_bridge::CvImageConstPtr image);
+
 void imageCallback(const sensor_msgs::ImageConstPtr & msg)
 {
-    cv_bridge::CvImageConstPtr imagePtr = cv_bridge::toCvShare(msg);
-    processImage(imagePtr);
-   // cv::imshow("Drone feed", imagePtr->image);
-    cv::waitKey(1);
+	if(sem_trywait(semaphore)!=0)
+		return;
+
+	cv_bridge::CvImageConstPtr imagePtr = cv_bridge::toCvShare(msg);
+	processImage(imagePtr);
+	cv::waitKey(1);
+	sem_post(semaphore);
 }
-
-
 int main(int argc, char ** argv)
 {
+	sem_init(semaphore, 0,1);
 	cv::namedWindow("Drone feed", 1);
     cv::createTrackbar("minDist", "Drone feed", &minDist, 300);
     cv::createTrackbar("param1", "Drone feed", &param1, 300);
@@ -39,14 +45,15 @@ int main(int argc, char ** argv)
     cv::createTrackbar("minRadius", "Drone feed", &minRadius, 300);
     cv::createTrackbar("maxRadius", "Drone feed", &maxRadius, 300);
 	using namespace image_transport;
-    ros::init(argc, argv, "RingDetector");
-    ros::NodeHandle nodeHandle;
+	ros::init(argc, argv, "RingDetector");
+	ros::NodeHandle nodeHandle;
 	ImageTransport it(nodeHandle);
     Subscriber sub = it.subscribe("ardrone/front/image_raw", 60, imageCallback);
     while(ros::ok()){
 		ros::spinOnce();
 		cv::waitKey(1);
     }
+	sem_destroy(semaphore);
     return 0;
 }
 
