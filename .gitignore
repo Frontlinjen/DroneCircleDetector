@@ -1,0 +1,6 @@
+.dir*
+*~
+GTAGS
+GSYMS
+GRTAGS
+GPATH
