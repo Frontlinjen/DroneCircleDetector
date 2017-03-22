@@ -10,9 +10,34 @@
 #include <string>
 #include <vector>
 #include <semaphore.h>
+#include <chrono>
+#include <utility>
 #include <math.h>
 #include <image_transport/image_transport.h>
 #include <opencv2/videoio.hpp>
+
+#define BEGIN_SCOPE_MEASURE 1
+
+#ifdef MEASURE_TIME
+#define BEGIN_SCOPE_MEASURE(name)  AutoTimeMeasure mTime(name)
+#else
+#define BEGIN_SCOPE_MEASURE(name) do {} while(0)
+#endif
+
+class AutoTimeMeasure{
+    const char * name;
+    std::chrono::high_resolution_clock::time_point start;
+public:
+    AutoTimeMeasure(const char * c)
+    {
+        name = c;
+        start = std::chrono::high_resolution_clock::now();
+    }
+    ~AutoTimeMeasure(){
+        std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+        ROS_INFO("%s finished in %ins", name, std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count());
+    }
+};
 
 const float UPDATE_RATE = 120.0;
 sem_t * semaphore;
@@ -30,7 +55,7 @@ void imageCallback(const sensor_msgs::ImageConstPtr & msg)
 {
 	if(sem_trywait(semaphore)!=0)
 		return;
-	writer->
+BEGIN_SCOPE_MEASURE("ImageProcessing");
 	cv_bridge::CvImageConstPtr imagePtr = cv_bridge::toCvShare(msg);
 	processImage(imagePtr);
 	cv::waitKey(1);
