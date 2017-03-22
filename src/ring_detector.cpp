@@ -4,7 +4,6 @@
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui.hpp>
-#include <opencv2/videoio.hpp>
 #include <opencv2/core/utility.hpp>
 #include <ros/ros.h>
 #include <iostream>
@@ -13,9 +12,11 @@
 #include <semaphore.h>
 #include <math.h>
 #include <image_transport/image_transport.h>
+#include <opencv2/videoio.hpp>
 
 const float UPDATE_RATE = 120.0;
 sem_t * semaphore;
+cv::VideoWriter * writer;
 
 int minDist = 10;
 int minRadius = 10;
@@ -29,16 +30,29 @@ void imageCallback(const sensor_msgs::ImageConstPtr & msg)
 {
 	if(sem_trywait(semaphore)!=0)
 		return;
-
+	writer->
 	cv_bridge::CvImageConstPtr imagePtr = cv_bridge::toCvShare(msg);
 	processImage(imagePtr);
 	cv::waitKey(1);
 	sem_post(semaphore);
 }
+void SetupRecorder()
+{
+//#if RECORD_STREAM
+    int width = cap.get(1280);
+    int height = cap.get(720);
+    int fps = cap.get(30);
+    int fourcc = VideoWriter::fourcc('M', 'J', 'P', 'G'); //cap.get(CAP_PROP_FOURCC);
+    writer = new cv::VideoWriter("sample.avi", fourcc, fps, Size(width, height));
+//    #endif
+}
+
 int main(int argc, char ** argv)
 {
-    semaphore = new sem_t();
+
+	semaphore = new sem_t();
 	sem_init(semaphore, 0,1);
+	SetupRecorder();
 	cv::namedWindow("Drone feed", 1);
     cv::createTrackbar("minDist", "Drone feed", &minDist, 300);
     cv::createTrackbar("param1", "Drone feed", &param1, 300);
@@ -55,7 +69,10 @@ int main(int argc, char ** argv)
 		cv::waitKey(1);
     }
 	sem_destroy(semaphore);
-    delete semaphore;
+    writer->release();
+    delete writer;
+	delete semaphore;
+
     return 0;
 }
 
