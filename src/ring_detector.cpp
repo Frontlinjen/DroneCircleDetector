@@ -59,7 +59,7 @@ int main(int argc, char ** argv)
 
 void processImage( cv_bridge::CvImageConstPtr image)
 {
-	mat grad;
+	cv::Mat grad;
 	double delta = 0.0;
 	double scale = 1.0;
 	int ddepth = CV_16S;
