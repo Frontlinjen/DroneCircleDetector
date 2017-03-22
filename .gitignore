@@ -4,3 +4,6 @@ GTAGS
 GSYMS
 GRTAGS
 GPATH
+*.project
+*.cproject
+.settings
