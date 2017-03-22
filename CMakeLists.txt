@@ -9,6 +9,7 @@ project(ring_detector)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
+  Threads
   #  image_geometry
   cv_bridge
   image_transport
@@ -183,7 +184,7 @@ include_directories(
 include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(ring_detector src/ring_detector.cpp)
 target_link_libraries(ring_detector ${catkin_LIBRARIES})
-
+target_link_libraries(ring_detector ${CMAKE_THREAD_LIBS_INIT})
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
 #   # myfile1
