@@ -37,6 +37,7 @@ void imageCallback(const sensor_msgs::ImageConstPtr & msg)
 }
 int main(int argc, char ** argv)
 {
+    semaphore = new sem_t();
 	sem_init(semaphore, 0,1);
 	cv::namedWindow("Drone feed", 1);
     cv::createTrackbar("minDist", "Drone feed", &minDist, 300);
@@ -54,12 +55,13 @@ int main(int argc, char ** argv)
 		cv::waitKey(1);
     }
 	sem_destroy(semaphore);
+    delete semaphore;
     return 0;
 }
 
 void processImage( cv_bridge::CvImageConstPtr image)
 {
-	cv::Mat grad;
+    cv::Mat grad;
 	double delta = 0.0;
 	double scale = 1.0;
 	int ddepth = CV_16S;

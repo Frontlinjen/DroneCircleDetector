@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.1)
 project(ring_detector)
 
 ## Add support for C++11, supported in ROS Kinetic and newer
@@ -9,13 +9,12 @@ project(ring_detector)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
-  Threads
   #  image_geometry
   cv_bridge
   image_transport
   roscpp
-)
-
+  )
+find_package(Threads REQUIRED)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -183,8 +182,10 @@ include_directories(
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(ring_detector src/ring_detector.cpp)
+#target_compile_options(ring_detector PUBLIC -lpthread)
+#target_link_libraries(ring_detector ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(ring_detector ${catkin_LIBRARIES})
-target_link_libraries(ring_detector ${CMAKE_THREAD_LIBS_INIT})
+
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
 #   # myfile1
