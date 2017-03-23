@@ -16,6 +16,15 @@
 #include <image_transport/image_transport.h>
 #include <opencv2/videoio.hpp>
 
+template<typename T, int MIN=0, int MAX=100, int RATIO=1>
+void TrackbarCallback(int pos, void * ptr){
+    if(pos < MIN || pos > MAX)
+        return;
+    double ratio = 1/RATIO;
+    T * val = static_cast<T*>(ptr);
+    *val = pos*RATIO;
+}
+
 #define MEASURE_TIME 1
 
 #ifdef MEASURE_TIME
@@ -73,6 +82,9 @@ void SetupRecorder()
 //    #endif
 }
 
+//min, max, step?
+
+
 int main(int argc, char ** argv)
 {
 
@@ -85,9 +97,11 @@ int main(int argc, char ** argv)
     cv::createTrackbar("param2", "Drone feed", &param2, 300);
     cv::createTrackbar("minRadius", "Drone feed", &minRadius, 300);
     cv::createTrackbar("maxRadius", "Drone feed", &maxRadius, 300);
-	using namespace image_transport;
+
+    using namespace image_transport;
 	ros::init(argc, argv, "RingDetector");
-	ros::NodeHandle nodeHandle;
+
+    ros::NodeHandle nodeHandle;
 	ImageTransport it(nodeHandle);
     Subscriber sub = it.subscribe("ardrone/front/image_raw", 60, imageCallback);
     while(ros::ok()){
