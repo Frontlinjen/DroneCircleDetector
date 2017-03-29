@@ -5,15 +5,15 @@
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/core/utility.hpp>
-#include <ros/ros.h>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <semaphore.h>
-#include <chrono>
-#include <utility>
-#include <math.h>
 #include <image_transport/image_transport.h>
 #include <opencv2/videoio.hpp>
 #include <ring_detector/Drone_Recorder.h>
 
+void Drone_Recorder::processImage(const cv_bridge::CvImageConstPtr image)
+{
+}
+
+void processImageCallback(const cv_bridge::CvImageConstPtr & imagePtr, void * _this)
+{
+	Drone_Recorder * recorder = static_cast<Drone_Recorder>(_this);
+}
