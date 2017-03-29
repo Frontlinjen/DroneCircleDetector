@@ -1,15 +1,21 @@
-/*
- * Drone_Recorder.h
- *
- *  Created on: Mar 29, 2017
- *      Author: senad
- */
+#include <ros/ros.h>
+#include <opencv2/videoio.hpp>
+#include <opencv2/imgcodecs.hpp>
 
-#ifndef INCLUDE_RING_DETECTOR_DRONE_RECORDER_H_
-#define INCLUDE_RING_DETECTOR_DRONE_RECORDER_H_
+class Drone_Recorder{
 
+	cv::VideoWriter * writer;
 
+	Drone_Recorder(){
+		const int width = 1280;
+		const int height = 720;
+		const int fps = 30;
+		const int fourcc = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
+		writer = new cv::VideoWriter("sample.avi", fourcc, fps, cv::Size(width, height));
+	}
 
-
-
-#endif /* INCLUDE_RING_DETECTOR_DRONE_RECORDER_H_ */
+	~Drone_Recorder(){
+		writer->flush();
+		writer->release();
+	}
+};

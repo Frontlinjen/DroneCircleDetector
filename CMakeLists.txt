@@ -182,7 +182,7 @@ include_directories(
 # )
 
 include_directories(include ${catkin_INCLUDE_DIRS})
-add_executable(ring_detector src/ring_detector.cpp src/Camera_Node.cpp)
+add_executable(ring_detector src/ring_detector.cpp src/Camera_Node.cpp src/Drone_Recorder.cpp)
 #target_compile_options(ring_detector PUBLIC -lpthread)
 #target_link_libraries(ring_detector ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(ring_detector ${catkin_LIBRARIES})

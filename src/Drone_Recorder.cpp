@@ -1,10 +1,19 @@
-/*
- * Drone_Recorder.cpp
- *
- *  Created on: Mar 29, 2017
- *      Author: senad
- */
-
-
-
+#include <ros/ros.h>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <cv_bridge/cv_bridge.h>
+#include <opencv2/core/mat.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/core/utility.hpp>
+#include <ros/ros.h>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <semaphore.h>
+#include <chrono>
+#include <utility>
+#include <math.h>
+#include <image_transport/image_transport.h>
+#include <opencv2/videoio.hpp>
+#include <ring_detector/Drone_Recorder.h>
 
