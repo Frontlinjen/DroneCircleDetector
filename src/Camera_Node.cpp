@@ -8,24 +8,16 @@
 #include "ring_detector/Drone_Recorder.h"
 #include "ring_detector/Ring_Detector.h"
 
-Camera_Node * Camera_Node::getInstance()
- {
-    if(instance == nullptr){
-      instance = new Camera_Node();
-    }
- }
 
 void Camera_Node::registerCallback(processImageCallback callback, void * data){
   callbacks.emplace_back(callback, data);
 }
 
 
-Camera_Node * Camera_Node::instance = nullptr;
 
 void Camera_Node::imageCallback(const sensor_msgs::ImageConstPtr & msg)
    {
-     Camera_Node * _this = Camera_Node::getInstance();
-     _this->processImage(msg);
+     processImage(msg);
    }
 
 void Camera_Node::processImage(const sensor_msgs::ImageConstPtr & msg)
@@ -43,8 +35,8 @@ void Camera_Node::processImage(const sensor_msgs::ImageConstPtr & msg)
 
 int main(int argc, char ** argv){
   ros::init(argc, argv, "RingDetector");
-  Camera_Node::getInstance(); //Creates the singleton and sets up the callbacks *hacky*
-  Ring_Detector detector;
+  Camera_Node cNode;
+  Ring_Detector detector(cNode);
   while(ros::ok()){
     ros::spinOnce();
     cv::waitKey(1);

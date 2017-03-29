@@ -35,19 +35,19 @@ private:
 public:
 	void processImage( cv_bridge::CvImageConstPtr image);
 
-	Ring_Detector() : UPDATE_RATE(120){
+	Ring_Detector(Camera_Node & node) : UPDATE_RATE(120){
 		minDist = 1;
 		minRadius = 0;
 		maxRadius = 0;
 		param1 = 100;
 		param2 = 100;
 		cv::namedWindow("Drone feed", 1);
-		cv::createTrackbar("minDist", "Drone feed", &minDist, 300, TrackbarCallback<int 	>);
+		cv::createTrackbar("minDist", "Drone feed", &minDist, 300, TrackbarCallback<int>);
 		cv::createTrackbar("param1", "Drone feed", &param1, 300, TrackbarCallback<int>);
 		cv::createTrackbar("param2", "Drone feed", &param2, 300, TrackbarCallback<int>);
 		cv::createTrackbar("minRadius", "Drone feed", &minRadius, 300, TrackbarCallback<int>);
 		cv::createTrackbar("maxRadius", "Drone feed", &maxRadius, 300, TrackbarCallback<int>);
-		Camera_Node::getInstance()->registerCallback(imageCallBack, this);
+		node.registerCallback(imageCallBack, this);
 	}
     static void imageCallBack(const cv_bridge::CvImageConstPtr & imagePtr, void * _this);
 };

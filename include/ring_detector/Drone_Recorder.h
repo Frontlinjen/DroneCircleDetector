@@ -10,13 +10,13 @@ class Drone_Recorder{
 	static void processImageCallback(const cv_bridge::CvImageConstPtr & imagePtr, void * _this);
 
 public:
-	Drone_Recorder(){
+	Drone_Recorder(Camera_Node & node){
 		const int width = 1280;
 		const int height = 720;
 		const int fps = 30;
 		const int fourcc = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
 		writer = new cv::VideoWriter("sample.avi", fourcc, fps, cv::Size(width, height));
-		Camera_Node::getInstance()->registerCallback(Drone_Recorder::processImageCallback, this);
+		node.registerCallback(Drone_Recorder::processImageCallback, this);
 	}
 	void processImage(const cv_bridge::CvImageConstPtr image);
 

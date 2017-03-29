@@ -19,22 +19,18 @@ class Camera_Node{
   typedef std::vector<Camera_Node::callbackEntry> CallbackContainer;
   CallbackContainer callbacks;
  public:
-  static Camera_Node * getInstance();
-  static void imageCallback(const sensor_msgs::ImageConstPtr & img);
+  void imageCallback(const sensor_msgs::ImageConstPtr & img);
   void registerCallback(processImageCallback, void * data);
-
- private:
-  void processImage(const sensor_msgs::ImageConstPtr & msg);
-  Camera_Node() : it(nodeHandle){
+ Camera_Node() : it(nodeHandle){
     sem_init(&semaphore, 0,1);
-    sub = it.subscribe("ardrone/front/image_raw", 60, imageCallback);
+    sub = it.subscribe<Camera_Node>("ardrone/front/image_raw", 60, &Camera_Node::imageCallback, this);
   };
-
-
   ~Camera_Node(){
     sem_destroy(&semaphore);
   };
-  static Camera_Node * instance;
+
+ private:
+  void processImage(const sensor_msgs::ImageConstPtr & msg);
   sem_t semaphore;
   ros::NodeHandle nodeHandle;
   image_transport::Subscriber sub;
