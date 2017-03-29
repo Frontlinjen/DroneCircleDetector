@@ -16,4 +16,5 @@ void Drone_Recorder::processImage(const cv_bridge::CvImageConstPtr image)
 void processImageCallback(const cv_bridge::CvImageConstPtr & imagePtr, void * _this)
 {
 	Drone_Recorder * recorder = static_cast<Drone_Recorder>(_this);
+	recorder->processImage(imagePtr);
 }
