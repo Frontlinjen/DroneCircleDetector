@@ -77,8 +77,8 @@ void SetupRecorder()
     const int width = 1280;
     const int height = 720;
     const int fps = 30;
-    const int fourcc = VideoWriter::fourcc('M', 'J', 'P', 'G'); //cap.get(CAP_PROP_FOURCC);
-    writer = new cv::VideoWriter("sample.avi", fourcc, fps, Size(width, height));
+    const int fourcc = cv::VideoWriter::fourcc('M', 'J', 'P', 'G'); //cap.get(CAP_PROP_FOURCC);
+    writer = new cv::VideoWriter("sample.avi", fourcc, fps, cv::Size(width, height));
 //    #endif
 }
 
@@ -92,7 +92,7 @@ int main(int argc, char ** argv)
 	sem_init(semaphore, 0,1);
 	SetupRecorder();
 	cv::namedWindow("Drone feed", 1);
-    cv::createTrackbar("minDist", "Drone feed", &minDist, 300);
+    cv::createTrackbar("minDist", "Drone feed", &minDist, 300, TrackbarCallback<int>);
     cv::createTrackbar("param1", "Drone feed", &param1, 300);
     cv::createTrackbar("param2", "Drone feed", &param2, 300);
     cv::createTrackbar("minRadius", "Drone feed", &minRadius, 300);
