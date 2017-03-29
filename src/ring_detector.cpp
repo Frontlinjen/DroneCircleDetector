@@ -9,19 +9,10 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <semaphore.h>
-#include <chrono>
-#include <utility>
 #include <math.h>
 #include <image_transport/image_transport.h>
 #include <opencv2/videoio.hpp>
 #include "ring_detector/Ring_Detector.h"
-
-
-int main(int argc, char ** argv)
-{
-
-}
 
 void Ring_Detector::processImage( cv_bridge::CvImageConstPtr image)
 {
@@ -56,4 +47,9 @@ void Ring_Detector::processImage( cv_bridge::CvImageConstPtr image)
          	cv::circle(droneFeed, center, radius, cv::Scalar(255,0,255), 3, 8, 0);
     	}
     	imshow("Drone Feed", droneFeed);
+}
+
+void Ring_Detector::imageCallBack(const cv_bridge::CvImageConstPtr & imagePtr, void * _this){
+	Ring_Detector * ring_detector = static_cast<Ring_Detector*>(_this);
+	ring_detector->processImage(imagePtr);
 }

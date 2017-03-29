@@ -15,6 +15,7 @@
 #include <math.h>
 #include <image_transport/image_transport.h>
 #include <opencv2/videoio.hpp>
+#include "Camera_Node.h"
 
 
 template<typename T, int MIN=0, int MAX=100, int RATIO=1>
@@ -45,5 +46,7 @@ public:
 		cv::createTrackbar("param2", "Drone feed", &param2, 300);
 		cv::createTrackbar("minRadius", "Drone feed", &minRadius, 300);
 		cv::createTrackbar("maxRadius", "Drone feed", &maxRadius, 300);
+		Camera_Node::getInstance()->registerCallback(imageCallBack, this);
 	}
+    static void imageCallBack(const cv_bridge::CvImageConstPtr & imagePtr, void * _this);
 };
