@@ -13,6 +13,11 @@ Camera_Node * Camera_Node::getInstance()
     }
  }
 
+void Camera_Node::registerCallback(processImageCallback callback, void * data){
+  callbacks.emplace_back(callback, data);
+}
+
+
 Camera_Node * Camera_Node::instance = nullptr;
 
 void Camera_Node::imageCallback(const sensor_msgs::ImageConstPtr & msg)
@@ -27,6 +32,9 @@ void Camera_Node::processImage(const sensor_msgs::ImageConstPtr & msg)
       return;
     BEGIN_SCOPE_MEASURE("ImageProcessing");
     cv_bridge::CvImageConstPtr imagePtr = cv_bridge::toCvShare(msg);
+    for(CallbackContainer::iterator itr = callbacks.begin(); itr != callbacks.end(); ++itr){
+      itr->func(imagePtr, itr->userdata);
+    }
     cv::waitKey(1);
     sem_post(&semaphore);
   }
