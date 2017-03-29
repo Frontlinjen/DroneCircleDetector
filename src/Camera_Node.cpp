@@ -38,25 +38,3 @@ void Camera_Node::processImage(const sensor_msgs::ImageConstPtr & msg)
     cv::waitKey(1);
     sem_post(&semaphore);
   }
-
-int main(int argc, char ** argv)
-{
-  cv::namedWindow("Drone feed", 1);
-  cv::createTrackbar("minDist", "Drone feed", &minDist, 300);
-  cv::createTrackbar("param1", "Drone feed", &param1, 300);
-  cv::createTrackbar("param2", "Drone feed", &param2, 300);
-  cv::createTrackbar("minRadius", "Drone feed", &minRadius, 300);
-  cv::createTrackbar("maxRadius", "Drone feed", &maxRadius, 300);
-
-  using namespace image_transport;
-  ros::init(argc, argv, "RingDetector");
-
-  ros::NodeHandle nodeHandle;
-  ImageTransport it(nodeHandle);
-  Subscriber sub = it.subscribe("ardrone/front/image_raw", 60, Camera_Node::imageCallback);
-  while(ros::ok()){
-    ros::spinOnce();
-    cv::waitKey(1);
-  }
-  return 0;
-}
