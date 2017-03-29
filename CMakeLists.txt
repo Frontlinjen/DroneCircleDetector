@@ -119,6 +119,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
+  include/,
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -181,7 +182,7 @@ include_directories(
 # )
 
 include_directories(include ${catkin_INCLUDE_DIRS})
-add_executable(ring_detector src/ring_detector.cpp)
+add_executable(ring_detector src/ring_detector.cpp src/Camera_Node.cpp)
 #target_compile_options(ring_detector PUBLIC -lpthread)
 #target_link_libraries(ring_detector ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(ring_detector ${catkin_LIBRARIES})
