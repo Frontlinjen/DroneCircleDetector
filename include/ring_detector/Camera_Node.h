@@ -1,3 +1,4 @@
+#pragma once
 #include <ros/ros.h>
 #include <semaphore.h>
 #include <vector>
@@ -27,15 +28,12 @@ class Camera_Node{
   Camera_Node() : it(nodeHandle){
     sem_init(&semaphore, 0,1);
     sub = it.subscribe("ardrone/front/image_raw", 60, imageCallback);
-    setupTrackbars();
-  }
-  void setupTrackbars(){
+  };
 
-  }
 
   ~Camera_Node(){
     sem_destroy(&semaphore);
-  }
+  };
   static Camera_Node * instance;
   sem_t semaphore;
   ros::NodeHandle nodeHandle;
