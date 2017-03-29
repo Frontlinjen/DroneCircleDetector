@@ -74,10 +74,10 @@ void imageCallback(const sensor_msgs::ImageConstPtr & msg)
 void SetupRecorder()
 {
 //#if RECORD_STREAM
-    int width = cap.get(1280);
-    int height = cap.get(720);
-    int fps = cap.get(30);
-    int fourcc = VideoWriter::fourcc('M', 'J', 'P', 'G'); //cap.get(CAP_PROP_FOURCC);
+    const int width = 1280;
+    const int height = 720;
+    const int fps = 30;
+    const int fourcc = VideoWriter::fourcc('M', 'J', 'P', 'G'); //cap.get(CAP_PROP_FOURCC);
     writer = new cv::VideoWriter("sample.avi", fourcc, fps, Size(width, height));
 //    #endif
 }
