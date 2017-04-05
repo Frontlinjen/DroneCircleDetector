@@ -9,6 +9,7 @@
 #include "ring_detector/Ring_Detector.h"
 
 
+
 void Camera_Node::registerCallback(processImageCallback callback, void * data){
   callbacks.emplace_back(callback, data);
 }

@@ -16,6 +16,11 @@
 
 void Ring_Detector::processImage( cv_bridge::CvImageConstPtr image)
 {
+	minDist = 1;
+	minRadius = 0;
+	maxRadius = 0;
+	param1 = 100;
+	param2 = 100;
     cv::Mat grad;
 	double delta = 0.0;
 	double scale = 1.0;
