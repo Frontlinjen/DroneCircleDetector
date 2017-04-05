@@ -18,7 +18,7 @@
 #include "Camera_Node.h"
 
 
-template<typename T, int MIN=0, int MAX=100, int RATIO=1>
+template<typename T, int MIN=0, int MAX=50, int RATIO=1>
 void TrackbarCallback(int pos, void * ptr){
     if(pos < MIN || pos > MAX)
         return;
@@ -37,16 +37,16 @@ public:
 
 	Ring_Detector(Camera_Node & node) : UPDATE_RATE(120){
 		minDist = 1;
-		minRadius = 0;
-		maxRadius = 0;
+		minRadius = 100;
+		maxRadius = 100;
 		param1 = 100;
 		param2 = 100;
 		cv::namedWindow("Drone feed", 1);
-		cv::createTrackbar("minDist", "Drone feed", &minDist, 300, TrackbarCallback<int>);
-		cv::createTrackbar("param1", "Drone feed", &param1, 300, TrackbarCallback<int>);
-		cv::createTrackbar("param2", "Drone feed", &param2, 300, TrackbarCallback<int>);
-		cv::createTrackbar("minRadius", "Drone feed", &minRadius, 300, TrackbarCallback<int>);
-		cv::createTrackbar("maxRadius", "Drone feed", &maxRadius, 300, TrackbarCallback<int>);
+		cv::createTrackbar("minDist", "Drone feed", &minDist, 300, TrackbarCallback<int>, &minDist);
+		cv::createTrackbar("param1", "Drone feed", &param1, 300, TrackbarCallback<int>, &param1);
+		cv::createTrackbar("param2", "Drone feed", &param2, 300, TrackbarCallback<int>, &param2);
+		cv::createTrackbar("minRadius", "Drone feed", &minRadius, 300, TrackbarCallback<int>, &minRadius);
+		cv::createTrackbar("maxRadius", "Drone feed", &maxRadius, 300, TrackbarCallback<int>, &maxRadius);
 		node.registerCallback(imageCallBack, this);
 	}
     static void imageCallBack(const cv_bridge::CvImageConstPtr & imagePtr, void * _this);
