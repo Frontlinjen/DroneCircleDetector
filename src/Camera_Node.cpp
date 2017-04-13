@@ -2,45 +2,60 @@
 #include <image_transport/image_transport.h>
 #include <semaphore.h>
 #include "ring_detector/Camera_Node.h"
-#include <cv_bridge/cv_bridge.h>
-#include <opencv2/highgui.hpp>
-#include "ring_detector/AutoTimeMeasure.h"
-#include "ring_detector/Drone_Recorder.h"
 #include "ring_detector/Ring_Detector.h"
 
-
-
-void Camera_Node::registerCallback(processImageCallback callback, void * data){
-  callbacks.emplace_back(callback, data);
+//Not thread safe
+void Camera_Node::RegisterCallback(ProcessImageCallback c){
+  m_Jobs.emplace_back(currentImage, c);
+  m_Workers.emplace_back(&ProcessingThread::Run, m_Jobs.back());
 }
 
 
+//Thread safe
+void Camera_Node::ImageCallback(const sensor_msgs::ImageConstPtr & msg)
+{
+  currentImage.Set(msg);
+}
 
-void Camera_Node::imageCallback(const sensor_msgs::ImageConstPtr & msg)
-   {
-     processImage(msg);
-   }
 
-void Camera_Node::processImage(const sensor_msgs::ImageConstPtr & msg)
-  {
-    if(sem_trywait(&semaphore)!=0)
-      return;
-    BEGIN_SCOPE_MEASURE("ImageProcessing");
-    cv_bridge::CvImageConstPtr imagePtr = cv_bridge::toCvShare(msg);
-    for(CallbackContainer::iterator itr = callbacks.begin(); itr != callbacks.end(); ++itr){
-      itr->func(imagePtr, itr->userdata);
-    }
-    cv::waitKey(1);
-    sem_post(&semaphore);
-  }
 
 int main(int argc, char ** argv){
   ros::init(argc, argv, "RingDetector");
   Camera_Node cNode;
   Ring_Detector detector(cNode);
+  cNode.Start();
+}
+
+
+void Camera_Node::Start(){
   while(ros::ok()){
     ros::spinOnce();
-    cv::waitKey(1);
   }
+  //Tell workers to finish whatever they are doing
+  JobList::iterator itr = m_Jobs.begin();
+  while(itr != m_Jobs.end()){
+    itr->Stop();
+    ++itr;
+  }
+  WorkerList::iterator workers = m_Workers.begin();
+  while(workers != m_Workers.end()){
+    workers->join();
+    ++workers;
+  }
+  m_Jobs.clear();
+  m_Workers.clear();
+}
 
+
+ProcessingThread::ProcessingThread(SharedResource<sensor_msgs::ImageConstPtr> & imageStore, ProcessImageCallback entry) :
+  m_CurrentImage(imageStore),
+  func(entry),
+  running(true)
+  {}
+
+void ProcessingThread::Run(){
+  while(running){
+   m_StartTime = time(0); //Logs the start time, so that we know when we started
+   func->ProcessImage(m_CurrentImage.Get());
+  }
 }

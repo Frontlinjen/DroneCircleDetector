@@ -1,38 +1,50 @@
 #pragma once
 #include <ros/ros.h>
-#include <semaphore.h>
+#include <stdio.h>
+#include <atomic>
+#include <thread>
 #include <vector>
+#include <mutex>
+#include <time.h>
+#include "AtomicQueue.h"
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
-typedef void (*processImageCallback)(const cv_bridge::CvImageConstPtr & imagePtr, void * _this);
+#include "ImageProcessor.h"
+#include "SharedResource.h"
+class ProcessingThread;
+
+typedef ImageProcessor* ProcessImageCallback;
+typedef std::vector<std::thread> WorkerList;
+typedef std::vector<ProcessingThread> JobList;
 
 class Camera_Node{
-  struct callbackEntry{
-    callbackEntry(processImageCallback callback, void * data)
-    {
-      func = callback;
-      userdata = data;
-    }
-    processImageCallback func;
-    void * userdata;
-  };
-  typedef std::vector<Camera_Node::callbackEntry> CallbackContainer;
-  CallbackContainer callbacks;
  public:
-  void imageCallback(const sensor_msgs::ImageConstPtr & img);
-  void registerCallback(processImageCallback, void * data);
- Camera_Node() : it(nodeHandle){
-    sem_init(&semaphore, 0,1);
-    sub = it.subscribe<Camera_Node>("ardrone/front/image_raw", 60, &Camera_Node::imageCallback, this);
+  void Start();
+  void ImageCallback(const sensor_msgs::ImageConstPtr & img);
+  void RegisterCallback(ProcessImageCallback c);
+  Camera_Node() : it(nodeHandle)
+     {
+        sub = it.subscribe<Camera_Node>("ardrone/front/image_raw", 60, &Camera_Node::ImageCallback, this);
   };
   ~Camera_Node(){
-    sem_destroy(&semaphore);
   };
 
  private:
-  void processImage(const sensor_msgs::ImageConstPtr & msg);
-  sem_t semaphore;
   ros::NodeHandle nodeHandle;
+  WorkerList  m_Workers;
+  JobList m_Jobs;
   image_transport::Subscriber sub;
   image_transport::ImageTransport it;
+  SharedResource<sensor_msgs::ImageConstPtr> currentImage;
+};
+
+class ProcessingThread{
+  time_t m_StartTime;
+  SharedResource<sensor_msgs::ImageConstPtr>& m_CurrentImage;
+  ProcessImageCallback func;
+  bool running;
+public:
+  ProcessingThread(SharedResource<sensor_msgs::ImageConstPtr> & imageStore, ProcessImageCallback entry);
+  void Run();
+  void Stop() { running = false; }
 };
