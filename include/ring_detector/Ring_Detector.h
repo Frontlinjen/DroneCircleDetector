@@ -13,7 +13,7 @@
 #include <chrono>
 #include <utility>
 #include <math.h>
-#include <image_transport/image_transport.h>
+#include <cv_bridge/cv_bridge.h>
 #include <opencv2/videoio.hpp>
 #include "Camera_Node.h"
 
@@ -27,16 +27,16 @@ void TrackbarCallback(int pos, void * ptr){
     *val = pos*RATIO;
 }
 
-class Ring_Detector{
+  class Ring_Detector : public ImageProcessor {
 private:
 	const float UPDATE_RATE;
 	int minDist, minRadius, maxRadius, param1, param2;
 
 public:
-	void processImage( cv_bridge::CvImageConstPtr image);
-
-	Ring_Detector(Camera_Node & node) : UPDATE_RATE(120){
-		minDist = 1;
+	void ProcessImage(const cv_bridge::CvImageConstPtr & resource) override;
+    virtual ~Ring_Detector() override {}
+	Ring_Detector() : UPDATE_RATE(120){
+       	minDist = 1;
 		minRadius = 100;
 		maxRadius = 100;
 		param1 = 100;
@@ -47,7 +47,6 @@ public:
 		cv::createTrackbar("param2", "Drone feed", &param2, 300, TrackbarCallback<int>, &param2);
 		cv::createTrackbar("minRadius", "Drone feed", &minRadius, 300, TrackbarCallback<int>, &minRadius);
 		cv::createTrackbar("maxRadius", "Drone feed", &maxRadius, 300, TrackbarCallback<int>, &maxRadius);
-		node.registerCallback(imageCallBack, this);
 	}
-    static void imageCallBack(const cv_bridge::CvImageConstPtr & imagePtr, void * _this);
+    
 };

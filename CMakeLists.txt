@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.1)
 project(ring_detector)
 
 ## Add support for C++11, supported in ROS Kinetic and newer
-add_definitions(-std=c++11)
+add_definitions(-std=c++14)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -14,7 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   image_transport
   roscpp
   )
-find_package(Threads REQUIRED)
+#find_package(Threads REQUIRED)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 

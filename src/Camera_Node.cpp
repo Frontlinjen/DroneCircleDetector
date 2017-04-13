@@ -14,7 +14,7 @@ void Camera_Node::RegisterCallback(ProcessImageCallback c){
 //Thread safe
 void Camera_Node::ImageCallback(const sensor_msgs::ImageConstPtr & msg)
 {
-  currentImage.Set(msg);
+  currentImage.Set(cv_bridge::toCvShare(msg));
 }
 
 
@@ -22,7 +22,8 @@ void Camera_Node::ImageCallback(const sensor_msgs::ImageConstPtr & msg)
 int main(int argc, char ** argv){
   ros::init(argc, argv, "RingDetector");
   Camera_Node cNode;
-  Ring_Detector detector(cNode);
+  Ring_Detector detector;
+  cNode.RegisterCallback(static_cast<ImageProcessor*>(&detector));
   cNode.Start();
 }
 
@@ -30,6 +31,7 @@ int main(int argc, char ** argv){
 void Camera_Node::Start(){
   while(ros::ok()){
     ros::spinOnce();
+    cv::waitKey(1);
   }
   //Tell workers to finish whatever they are doing
   JobList::iterator itr = m_Jobs.begin();
@@ -47,7 +49,7 @@ void Camera_Node::Start(){
 }
 
 
-ProcessingThread::ProcessingThread(SharedResource<sensor_msgs::ImageConstPtr> & imageStore, ProcessImageCallback entry) :
+ProcessingThread::ProcessingThread(SharedResource<cv_bridge::CvImageConstPtr> & imageStore, ProcessImageCallback entry) :
   m_CurrentImage(imageStore),
   func(entry),
   running(true)

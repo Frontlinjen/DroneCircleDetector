@@ -14,21 +14,19 @@
 #include <opencv2/videoio.hpp>
 #include "ring_detector/Ring_Detector.h"
 
-void Ring_Detector::processImage( cv_bridge::CvImageConstPtr image)
+void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr & resource)
 {
-	minDist = 1;
-	minRadius = 0;
-	maxRadius = 0;
-	param1 = 100;
-	param2 = 100;
-    cv::Mat grad;
+  if(resource.get() == NULL)
+    return;
+  cv::Mat grad;
+  std::vector<int> v;
 	double delta = 0.0;
 	double scale = 1.0;
 	int ddepth = CV_16S;
 	cv::Mat droneFeed;
 	cv::Mat grad_x, grad_y;
 	cv::Mat abs_grad_x, abs_grad_y;
-	cv::cvtColor(image->image, droneFeed, CV_BGR2GRAY);
+	cv::cvtColor(resource->image, droneFeed, CV_BGR2GRAY);
 	cv::GaussianBlur(droneFeed, droneFeed, cv::Size(9, 9), 1, 1, cv::BORDER_DEFAULT );
 	cv::Sobel(droneFeed, grad_x, CV_32FC1, 1, 0, 3);
 	convertScaleAbs( grad_x, abs_grad_x );
@@ -52,9 +50,7 @@ void Ring_Detector::processImage( cv_bridge::CvImageConstPtr image)
          	cv::circle(droneFeed, center, radius, cv::Scalar(255,0,255), 3, 8, 0);
     	}
     	imshow("Drone Feed", droneFeed);
+        cv::waitKey(1);
 }
-
-void Ring_Detector::imageCallBack(const cv_bridge::CvImageConstPtr & imagePtr, void * _this){
-	Ring_Detector * ring_detector = static_cast<Ring_Detector*>(_this);
-	ring_detector->processImage(imagePtr);
-}
+ 
+ 

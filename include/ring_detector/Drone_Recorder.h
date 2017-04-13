@@ -16,7 +16,7 @@ public:
 		const int fps = 30;
 		const int fourcc = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
 		writer = new cv::VideoWriter("sample.avi", fourcc, fps, cv::Size(width, height));
-		node.registerCallback(Drone_Recorder::processImageCallback, this);
+		//node.registerCallback(Drone_Recorder::processImageCallback, this);
 	}
 	void processImage(const cv_bridge::CvImageConstPtr image);
 

@@ -35,16 +35,16 @@ class Camera_Node{
   JobList m_Jobs;
   image_transport::Subscriber sub;
   image_transport::ImageTransport it;
-  SharedResource<sensor_msgs::ImageConstPtr> currentImage;
+  SharedResource<cv_bridge::CvImageConstPtr> currentImage;
 };
 
 class ProcessingThread{
   time_t m_StartTime;
-  SharedResource<sensor_msgs::ImageConstPtr>& m_CurrentImage;
+  SharedResource<cv_bridge::CvImageConstPtr>& m_CurrentImage;
   ProcessImageCallback func;
   bool running;
 public:
-  ProcessingThread(SharedResource<sensor_msgs::ImageConstPtr> & imageStore, ProcessImageCallback entry);
+  ProcessingThread(SharedResource<cv_bridge::CvImageConstPtr> & imageStore, ProcessImageCallback entry);
   void Run();
   void Stop() { running = false; }
 };
