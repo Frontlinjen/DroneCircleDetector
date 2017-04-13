@@ -31,7 +31,7 @@ int main(int argc, char ** argv){
 void Camera_Node::Start(){
   while(ros::ok()){
     ros::spinOnce();
-    cv::waitKey(1);
+    
   }
   //Tell workers to finish whatever they are doing
   JobList::iterator itr = m_Jobs.begin();

@@ -43,7 +43,8 @@ public:
 		maxRadius = 100;
 		param1 = 100;
 		param2 = 100;
-		cv::namedWindow("Drone feed", 1);
+		cv::namedWindow("Drone feed", CV_WINDOW_NORMAL);
+		cv::namedWindow("Input feed", CV_WINDOW_NORMAL);
 		cv::createTrackbar("minDist", "Drone feed", &minDist, 300, TrackbarCallback<int>, &minDist);
 		cv::createTrackbar("param1", "Drone feed", &param1, 300, TrackbarCallback<int>, &param1);
 		cv::createTrackbar("param2", "Drone feed", &param2, 300, TrackbarCallback<int>, &param2);
