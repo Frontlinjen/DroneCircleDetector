@@ -33,8 +33,10 @@ private:
 	int minDist, minRadius, maxRadius, param1, param2;
 
 public:
-	void ProcessImage(const cv_bridge::CvImageConstPtr & resource) override;
-    virtual ~Ring_Detector() override {}
+	void ProcessImage(const cv_bridge::CvImageConstPtr resource) override;
+    virtual ~Ring_Detector() override {
+      cv::destroyWindow("Drone feed");
+    }
 	Ring_Detector() : UPDATE_RATE(120){
        	minDist = 1;
 		minRadius = 100;

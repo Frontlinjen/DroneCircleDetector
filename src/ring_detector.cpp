@@ -14,7 +14,7 @@
 #include <opencv2/videoio.hpp>
 #include "ring_detector/Ring_Detector.h"
 
-void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr & resource)
+void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
 {
   if(resource.get() == NULL)
     return;

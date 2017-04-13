@@ -3,7 +3,7 @@
 #include <semaphore.h>
 #include "ring_detector/Camera_Node.h"
 #include "ring_detector/Ring_Detector.h"
-
+#include <opencv2/highgui.hpp>
 //Not thread safe
 void Camera_Node::RegisterCallback(ProcessImageCallback c){
   m_Jobs.emplace_back(currentImage, c);
@@ -46,6 +46,7 @@ void Camera_Node::Start(){
   }
   m_Jobs.clear();
   m_Workers.clear();
+  cv::destroyAllWindows();
 }
 
 
