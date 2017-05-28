@@ -16,6 +16,8 @@
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/videoio.hpp>
 #include "Camera_Node.h"
+#include "ImageProcessor.h"
+
 
 
 template<typename T, int MIN=0, int MAX=50, int RATIO=1>
@@ -31,6 +33,7 @@ void TrackbarCallback(int pos, void * ptr){
 private:
 	const float UPDATE_RATE;
 	int minDist, minRadius, maxRadius, param1, param2;
+	bool initialized;
 
 public:
 	void ProcessImage(const cv_bridge::CvImageConstPtr resource) override;
@@ -41,15 +44,9 @@ public:
        	minDist = 1;
 		minRadius = 100;
 		maxRadius = 100;
+		initialized = false;
 		param1 = 100;
 		param2 = 100;
-		cv::namedWindow("Drone feed", CV_WINDOW_NORMAL);
-		cv::namedWindow("Input feed", CV_WINDOW_NORMAL);
-		cv::createTrackbar("minDist", "Drone feed", &minDist, 300, TrackbarCallback<int>, &minDist);
-		cv::createTrackbar("param1", "Drone feed", &param1, 300, TrackbarCallback<int>, &param1);
-		cv::createTrackbar("param2", "Drone feed", &param2, 300, TrackbarCallback<int>, &param2);
-		cv::createTrackbar("minRadius", "Drone feed", &minRadius, 300, TrackbarCallback<int>, &minRadius);
-		cv::createTrackbar("maxRadius", "Drone feed", &maxRadius, 300, TrackbarCallback<int>, &maxRadius);
 	}
     
 };
