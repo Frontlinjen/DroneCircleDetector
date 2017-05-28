@@ -16,22 +16,22 @@
 
 void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
 {
-  if(resource.get() == NULL)
-    return;
-  if(!initialized)
-  {
+	if(resource.get() == NULL)
+		return;
+	if(!initialized)
+	{
 
-	  cv::namedWindow("Drone feed", CV_WINDOW_NORMAL);
-	  		cv::namedWindow("Input feed", CV_WINDOW_NORMAL);
-	  		cv::createTrackbar("minDist", "Drone feed", dummy, 300, TrackbarCallback<int, 1, 300>, &minDist);
-	  		cv::createTrackbar("param1", "Drone feed", dummy, 300, TrackbarCallback<int, 1, 300>, &param1);
-	  		cv::createTrackbar("param2", "Drone feed", dummy, 300, TrackbarCallback<int, 1, 300>, &param2);
-	  		cv::createTrackbar("minRadius", "Drone feed", dummy, 300, TrackbarCallback<int, 1, 300>, &minRadius);
-	  		cv::createTrackbar("maxRadius", "Drone feed", dummy, 300, TrackbarCallback<int, 1, 300>, &maxRadius);
-  initialized = true;
-  }
-  cv::Mat grad;
-  std::vector<int> v;
+		cv::namedWindow("Drone feed", CV_WINDOW_NORMAL);
+		cv::namedWindow("Input feed", CV_WINDOW_NORMAL);
+		cv::createTrackbar("minDist", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &minDist);
+		cv::createTrackbar("param1", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &param1);
+		cv::createTrackbar("param2", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &param2);
+		cv::createTrackbar("minRadius", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &minRadius);
+		cv::createTrackbar("maxRadius", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &maxRadius);
+		initialized = true;
+	}
+	cv::Mat grad;
+	std::vector<int> v;
 	double delta = 0.0;
 	double scale = 1.0;
 	int ddepth = CV_16S;
@@ -45,24 +45,23 @@ void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
 	convertScaleAbs( grad_y, abs_grad_y );
 	cv::Sobel(droneFeed, grad_y, CV_32FC1, 0, 1, 3);
 	std::vector<cv::Vec3f> circles;
-    	double dminDist = minDist / 1.0;
-    	double dparam1 = param1 / 1.0;
-    	double dparam2 = param2 / 1.0;
-    	double dminRadius = minRadius / 1.0;
-    	double dmaxRadius = maxRadius / 1.0;
-
-    	cv::HoughCircles(droneFeed, circles, CV_HOUGH_GRADIENT, 1, minDist, dparam1, dparam2, dminRadius, dmaxRadius);
-    	for( size_t i = 0; i < circles.size(); i++ )
-    	{
-    		cv::Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
-        	int radius = cvRound(circles[i][2]);
-        	// draw the circle center
-         	cv::circle(droneFeed, center, 3, cv::Scalar(255,255,255), -1, 8, 0);
-         	// draw the circle outline
-         	cv::circle(droneFeed, center, radius, cv::Scalar(255,0,255), 3, 8, 0);
-    	}
-    	imshow("Drone Feed", droneFeed);
-        cv::waitKey(1);
+	double dminDist = minDist / 1.0;
+	double dparam1 = param1 / 1.0;
+	double dparam2 = param2 / 1.0;
+	double dminRadius = minRadius / 1.0;
+	double dmaxRadius = maxRadius / 1.0;
+	cv::HoughCircles(droneFeed, circles, CV_HOUGH_GRADIENT, 1, minDist, dparam1, dparam2, dminRadius, dmaxRadius);
+	for( size_t i = 0; i < circles.size(); i++ )
+	{
+		cv::Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+		int radius = cvRound(circles[i][2]);
+		// draw the circle center
+		cv::circle(droneFeed, center, 3, cv::Scalar(255,255,255), -1, 8, 0);
+		// draw the circle outline
+		cv::circle(droneFeed, center, radius, cv::Scalar(255,0,255), 3, 8, 0);
+	}
+	imshow("Drone Feed", droneFeed);
+	cv::waitKey(1);
 }
- 
- 
+
+
