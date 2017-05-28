@@ -19,8 +19,12 @@
 #include "ImageProcessor.h"
 
 class QR_Detector : public ImageProcessor{
-	private:
-
 	public:
 		void ProcessImage(const cv_bridge::CvImageConstPtr resource) override;
+		virtual ~QR_Detector() override {
+		      cv::destroyWindow("MyVideo");
+		    }
+		QR_Detector(){
+
+		}
 };

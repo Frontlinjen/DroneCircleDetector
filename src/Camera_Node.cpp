@@ -4,6 +4,7 @@
 #include "ring_detector/Camera_Node.h"
 #include "ring_detector/Ring_Detector.h"
 #include <opencv2/highgui.hpp>
+#include "ring_detector/QR_Detector.h"
 //Not thread safe
 void Camera_Node::RegisterCallback(ProcessImageCallback c){
   m_Jobs.emplace_back(currentImage, c);
@@ -23,7 +24,9 @@ int main(int argc, char ** argv){
   ros::init(argc, argv, "RingDetector");
   Camera_Node cNode;
   Ring_Detector detector;
+  QR_Detector qrdetector;
   cNode.RegisterCallback(static_cast<ImageProcessor*>(&detector));
+  cNode.RegisterCallback(static_cast<ImageProcessor*>(&qrdetector));
   cNode.Start();
 }
 
