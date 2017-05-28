@@ -34,13 +34,15 @@ private:
 	const float UPDATE_RATE;
 	int minDist, minRadius, maxRadius, param1, param2;
 	bool initialized;
-
+	int * dummy; //The trackbar needs a pointer even though the documentation marks it as "optional"
 public:
 	void ProcessImage(const cv_bridge::CvImageConstPtr resource) override;
     virtual ~Ring_Detector() override {
       cv::destroyWindow("Drone feed");
+      delete dummy;
     }
 	Ring_Detector() : UPDATE_RATE(120){
+		dummy = new int(1);
        	minDist = 1;
 		minRadius = 100;
 		maxRadius = 100;

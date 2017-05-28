@@ -18,16 +18,16 @@ void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
 {
   if(resource.get() == NULL)
     return;
-
   if(!initialized)
   {
+
 	  cv::namedWindow("Drone feed", CV_WINDOW_NORMAL);
 	  		cv::namedWindow("Input feed", CV_WINDOW_NORMAL);
-	  		cv::createTrackbar("minDist", "Drone feed", NULL, 300, TrackbarCallback<int, 1, 300>, &minDist);
-	  		cv::createTrackbar("param1", "Drone feed", NULL, 300, TrackbarCallback<int, 1, 300>, &param1);
-	  		cv::createTrackbar("param2", "Drone feed", NULL, 300, TrackbarCallback<int, 1, 300>, &param2);
-	  		cv::createTrackbar("minRadius", "Drone feed", NULL, 300, TrackbarCallback<int, 1, 300>, &minRadius);
-	  		cv::createTrackbar("maxRadius", "Drone feed", NULL, 300, TrackbarCallback<int, 1, 300>, &maxRadius);
+	  		cv::createTrackbar("minDist", "Drone feed", dummy, 300, TrackbarCallback<int, 1, 300>, &minDist);
+	  		cv::createTrackbar("param1", "Drone feed", dummy, 300, TrackbarCallback<int, 1, 300>, &param1);
+	  		cv::createTrackbar("param2", "Drone feed", dummy, 300, TrackbarCallback<int, 1, 300>, &param2);
+	  		cv::createTrackbar("minRadius", "Drone feed", dummy, 300, TrackbarCallback<int, 1, 300>, &minRadius);
+	  		cv::createTrackbar("maxRadius", "Drone feed", dummy, 300, TrackbarCallback<int, 1, 300>, &maxRadius);
   initialized = true;
   }
   cv::Mat grad;
