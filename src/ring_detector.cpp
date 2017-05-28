@@ -18,6 +18,18 @@ void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
 {
   if(resource.get() == NULL)
     return;
+
+  if(!initialized)
+  {
+	  cv::namedWindow("Drone feed", CV_WINDOW_NORMAL);
+	  		cv::namedWindow("Input feed", CV_WINDOW_NORMAL);
+	  		cv::createTrackbar("minDist", "Drone feed", NULL, 300, TrackbarCallback<int, 1, 300>, &minDist);
+	  		cv::createTrackbar("param1", "Drone feed", NULL, 300, TrackbarCallback<int, 1, 300>, &param1);
+	  		cv::createTrackbar("param2", "Drone feed", NULL, 300, TrackbarCallback<int, 1, 300>, &param2);
+	  		cv::createTrackbar("minRadius", "Drone feed", NULL, 300, TrackbarCallback<int, 1, 300>, &minRadius);
+	  		cv::createTrackbar("maxRadius", "Drone feed", NULL, 300, TrackbarCallback<int, 1, 300>, &maxRadius);
+  initialized = true;
+  }
   cv::Mat grad;
   std::vector<int> v;
 	double delta = 0.0;
@@ -38,7 +50,7 @@ void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
     	double dparam2 = param2 / 1.0;
     	double dminRadius = minRadius / 1.0;
     	double dmaxRadius = maxRadius / 1.0;
-    	cv::HoughCircles(droneFeed, circles, CV_HOUGH_GRADIENT, 1, minDist, dparam1, dparam2, dminRadius, dmaxRadius);
+
     	cv::HoughCircles(droneFeed, circles, CV_HOUGH_GRADIENT, 1, minDist, dparam1, dparam2, dminRadius, dmaxRadius);
     	for( size_t i = 0; i < circles.size(); i++ )
     	{
