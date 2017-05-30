@@ -17,14 +17,16 @@
 #include <opencv2/videoio.hpp>
 #include "Camera_Node.h"
 #include "ImageProcessor.h"
+#include <zbar.h>
 
 class QR_Detector : public ImageProcessor{
+	zbar::ImageScanner scanner;
 	public:
 		void ProcessImage(const cv_bridge::CvImageConstPtr resource) override;
 		virtual ~QR_Detector() override {
 		      cv::destroyWindow("MyVideo");
 		    }
 		QR_Detector(){
-
+			scanner.set_config(zbar::ZBAR_NONE, zbar::ZBAR_CFG_ENABLE, 1);
 		}
 };

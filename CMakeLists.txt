@@ -12,9 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   #  image_geometry
   cv_bridge
   image_transport
-  roscpp
-  )
-#find_package(Threads REQUIRED)
+  roscpp)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -186,6 +184,7 @@ add_executable(ring_detector src/ring_detector.cpp src/Camera_Node.cpp src/QR_De
 #target_compile_options(ring_detector PUBLIC -lpthread)
 #target_link_libraries(ring_detector ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(ring_detector ${catkin_LIBRARIES})
+target_link_libraries(ring_detector zbar)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
