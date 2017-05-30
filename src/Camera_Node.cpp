@@ -5,6 +5,8 @@
 #include "ring_detector/Ring_Detector.h"
 #include <opencv2/highgui.hpp>
 #include "ring_detector/QR_Detector.h"
+#include <iostream>
+#include <opencv2/core/ocl.hpp>
 //Not thread safe
 void Camera_Node::RegisterCallback(ProcessImageCallback c){
   m_Jobs.emplace_back(currentImage, c);
@@ -22,6 +24,9 @@ void Camera_Node::ImageCallback(const sensor_msgs::ImageConstPtr & msg)
 
 int main(int argc, char ** argv){
   ros::init(argc, argv, "RingDetector");
+  std::cout << "Using OpenCV: " << CV_VERSION << '\n';
+  std::cout << "Supports OpenCL: " << cv::ocl::haveOpenCL() << '\n';
+  
   Camera_Node cNode;
   Ring_Detector detector;
   QR_Detector qrdetector;
