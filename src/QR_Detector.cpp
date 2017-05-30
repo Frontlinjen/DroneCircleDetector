@@ -26,6 +26,19 @@ void QR_Detector::ProcessImage(const cv_bridge::CvImageConstPtr resource)
 	int result = scanner.scan(imageToScan);
 	for(zbar::Image::SymbolIterator itr = imageToScan.symbol_begin(); itr != imageToScan.symbol_end(); ++itr){
 		std::cout << "decoded" << itr->get_type_name() << "symbol" << itr->get_data() << "" << "" << std::endl;
+		std::vector<cv::Point> vp;
+		int n = itr->get_location_size();
+		for(int i = 0; i < n; i++){
+			vp.push_back(cv::Point(itr->get_location_x(i), itr->get_location_y(i)));
+		}
+		cv::RotatedRect r = minAreaRect(vp);
+		cv::Point2f pts[4];
+		r.points(pts);
+		for(int i = 0; i < 4; i++){
+			cv::line(img, pts[i], pts[(i+1)%4],cv::Scalar(255,0,0),3);
+		}
+		std::cout << "Angle: " << r.angle << std::endl;
+
 	}
 	imageToScan.set_data(NULL, 0);
 }
