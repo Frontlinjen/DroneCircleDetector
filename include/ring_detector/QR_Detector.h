@@ -18,16 +18,19 @@
 #include "Camera_Node.h"
 #include "ImageProcessor.h"
 #include <zbar.h>
+#include "RingEstimation.h"
 
 constexpr int width = 196;
 constexpr float constant = 561.2244898;
 class QR_Detector : public ImageProcessor{
 	zbar::ImageScanner scanner;
-	private:
 	float deltaDistance = 0;
-
-	public:
-		void ProcessImage(const cv_bridge::CvImageConstPtr resource) override;
+	RingEstimation* m_callOnFinish;
+ public:
+	QR_Detector(RingEstimation* callback){
+	  m_callOnFinish = callback;
+	}
+	void ProcessImage(const cv_bridge::CvImageConstPtr resource) override;
 		virtual ~QR_Detector() override {
 		      cv::destroyWindow("MyVideo");
 		    }
