@@ -46,7 +46,7 @@ void QR_Detector::ProcessImage(const cv_bridge::CvImageConstPtr resource)
 		deltaDistance = (width * constant) / pixels;
 		std::cout << "Angle: " << r.angle << std::endl;
 		std::cout << "Distance: " << deltaDistance << std::endl;
-		data->ring_number = itr->get_data();
+		//data->ring_number = itr->get_data();
 		data->angle = r.angle;
 		data->distance = deltaDistance;
 		data->x = r.center.x;
