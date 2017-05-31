@@ -46,7 +46,15 @@ void QR_Detector::ProcessImage(const cv_bridge::CvImageConstPtr resource)
 		deltaDistance = (width * constant) / pixels;
 		std::cout << "Angle: " << r.angle << std::endl;
 		std::cout << "Distance: " << deltaDistance << std::endl;
-		data->ring_number = itr->get_data();
+		if(itr->get_data().at(0) == 'p' || itr->get_data().at(0) == 'P')
+		{
+			data->ring_number = std::atoi(&itr->get_data().at(3));
+			std::cout << "Ring number: " << data->ring_number << std::endl;
+		}
+
+		if(itr->get_data().at(0) == 'w' || itr->get_data().at(0) == 'W'){
+			std::cout << "The QR code is a wall!: " << std::endl;
+		}
 		data->angle = r.angle;
 		data->distance = deltaDistance;
 		data->x = r.center.x;

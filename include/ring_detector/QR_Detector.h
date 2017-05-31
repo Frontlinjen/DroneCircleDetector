@@ -19,8 +19,8 @@
 #include "ImageProcessor.h"
 #include <zbar.h>
 
-constexpr int width = 196;
-constexpr float constant = 561.2244898;
+constexpr int width = 194; //214 when testing
+constexpr float constant = 561.2244897959; //514.0186915888 when testing
 class QR_Detector : public ImageProcessor{
 	zbar::ImageScanner scanner;
 	private:
