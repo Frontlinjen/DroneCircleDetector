@@ -7,6 +7,7 @@ typedef std::vector<RingData*> RingBucketContainer;
 
 class RingBucket{
 RingBucketContainer m_buckets[grid_height][grid_width];
+private:
 
 public:
 //Inserts the ring into a bucket and takes ownership
