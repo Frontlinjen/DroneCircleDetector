@@ -23,3 +23,18 @@ void RingBucket::Remove(RingData* data){
 		}
 	}
 }
+
+RingBucket::~RingBucket(){
+  RingBucketContainer::iterator itr;
+  for(unsigned int i = 0;i<grid_height;++i){
+    for(unsigned int m = 0; m<grid_width;++m){
+      RingBucketContainer * container = &m_buckets[i][m];
+      itr = container->begin();
+      while(itr != container->end()){
+	delete *itr;
+	++itr;
+      }
+      container->clear();
+    }
+  }
+}
