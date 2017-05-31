@@ -11,7 +11,7 @@ struct QRData{
   unsigned int x, y;
   float angle;
   char ring_number;
-  unsigned int px_w, px_h;
+  float distance;
 };
 
 template<typename T>

@@ -19,8 +19,13 @@
 #include "ImageProcessor.h"
 #include <zbar.h>
 
+constexpr int width = 196;
+constexpr float constant = 561.2244898;
 class QR_Detector : public ImageProcessor{
 	zbar::ImageScanner scanner;
+	private:
+	float deltaDistance = 0;
+
 	public:
 		void ProcessImage(const cv_bridge::CvImageConstPtr resource) override;
 		virtual ~QR_Detector() override {
