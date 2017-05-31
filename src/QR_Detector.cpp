@@ -22,6 +22,7 @@ void QR_Detector::ProcessImage(const cv_bridge::CvImageConstPtr resource)
 			return;
 	cv::Mat img;
 	cv::cvtColor(resource->image,img,CV_BGR2GRAY);
+	img = img > 128;
 	zbar::Image imageToScan(img.cols, img.rows, "Y800", img.data, img.cols*img.rows);
 	int result = scanner.scan(imageToScan);
 	for(zbar::Image::SymbolIterator itr = imageToScan.symbol_begin(); itr != imageToScan.symbol_end(); ++itr){
