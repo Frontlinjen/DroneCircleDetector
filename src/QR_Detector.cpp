@@ -53,7 +53,17 @@ void QR_Detector::ProcessImage(const cv_bridge::CvImageConstPtr resource)
 		}
 
 		if(itr->get_data().at(0) == 'w' || itr->get_data().at(0) == 'W'){
-			std::cout << "The QR code is a wall!: " << std::endl;
+			std::cout << "The QR code is a wall! Which belongs to the ";
+			switch(itr->get_data().at(2)){
+				case 0 : std::cout << "north wall" << std::endl;
+				break;
+				case 1 : std::cout << "east wall" << std::endl;
+				break;
+				case 2 : std::cout << "south wall" << std::endl;
+				break;
+				case 3 : std::cout << "west wall" << std::endl;;
+				break;
+			}
 		}
 		data->angle = r.angle;
 		data->distance = deltaDistance;
