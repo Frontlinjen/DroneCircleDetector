@@ -32,13 +32,8 @@ void RingEstimation::Run(){
 }
 
 void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
-	for(int i = 0; i<circles->objects.size(); i++){
-		float dist = 0;
-		float shortDist = 0;
-		dist = ((1000 * 561.2244897959) / circles->objects[i].radius);
-		if(dist < shortDist){
 
-		}
+	for(std::vector<CircleData>::iterator itr = circles->objects.begin(); itr != circles->objects.end(); ++itr){
 
 	}
 

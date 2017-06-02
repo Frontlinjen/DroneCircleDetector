@@ -29,6 +29,7 @@ struct RingData{
   float delta_x, delta_y, delta_z; //The rings position relative to the camera
   float abs_x, abs_y, abs_z; //The rings position in world coordinates.
   float norm_x, norm_y; //The direction of the ring
+  float distance;
   unsigned long timestamp;
   unsigned long viewcount;
 };
