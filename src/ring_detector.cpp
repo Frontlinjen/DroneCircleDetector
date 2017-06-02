@@ -72,19 +72,20 @@ void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
     cv::imshow("red", hueMask);
 
     //Circle detection
-    cv::cvtColor(resource->image, droneFeed, CV_BGR2GRAY);
-	cv::GaussianBlur(droneFeed, droneFeed, cv::Size(9, 9), 1, 1, cv::BORDER_DEFAULT );
-	cv::Sobel(droneFeed, grad_x, CV_32FC1, 1, 0, 3);
+    //cv::cvtColor(hueMask, hueMask, CV_BGR2GRAY);
+    	cv::GaussianBlur(hueMask, hueMask, cv::Size(9, 9), 1, 1, cv::BORDER_DEFAULT );
+	/*cv::Sobel(droneFeed, grad_x, CV_32FC1, 1, 0, 3);
 	convertScaleAbs( grad_x, abs_grad_x );
 	convertScaleAbs( grad_y, abs_grad_y );
-	cv::Sobel(droneFeed, grad_y, CV_32FC1, 0, 1, 3);
+	cv::Sobel(droneFeed, grad_y, CV_32FC1, 0, 1, 3);*/
 	std::vector<cv::Vec3f> circles;
 	double dminDist = minDist / 1.0;
 	double dparam1 = param1 / 1.0;
 	double dparam2 = param2 / 1.0;
 	double dminRadius = minRadius / 1.0;
 	double dmaxRadius = maxRadius / 1.0;
-	cv::HoughCircles(droneFeed, circles, CV_HOUGH_GRADIENT, 1, minDist, dparam1, dparam2, dminRadius, dmaxRadius);
+	cv::HoughCircles(hueMask, circles, CV_HOUGH_GRADIENT, 1, minDist, dparam1, dparam2, dminRadius, dmaxRadius);
+        droneFeed = resource->image;
 	CircleScanResult * circleResult = new CircleScanResult;
 	for(std::vector<cv::Vec3f>::iterator itr = circles.begin(); itr != circles.end(); ++itr )
 	{
