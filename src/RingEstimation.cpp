@@ -33,4 +33,7 @@ ProcessImage(circle, QR);
 
 void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
   //Process image..
+
+  delete circles;
+  delete QR;
 }
