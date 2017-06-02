@@ -5,6 +5,7 @@
 #include "ring_detector/Ring_Detector.h"
 #include <opencv2/highgui.hpp>
 #include "ring_detector/QR_Detector.h"
+#include "ring_detector/RingEstimation.h"
 #include <iostream>
 #include <opencv2/core/ocl.hpp>
 //Not thread safe
@@ -26,10 +27,10 @@ int main(int argc, char ** argv){
   ros::init(argc, argv, "RingDetector");
   std::cout << "Using OpenCV: " << CV_VERSION << '\n';
   std::cout << "Supports OpenCL: " << cv::ocl::haveOpenCL() << '\n';
-  
+  RingEstimation estimator;
   Camera_Node cNode;
-  Ring_Detector detector;
-  QR_Detector qrdetector;
+  Ring_Detector detector(&estimator);
+  QR_Detector qrdetector(&estimator);
   cNode.RegisterCallback(static_cast<ImageProcessor*>(&detector));
   cNode.RegisterCallback(static_cast<ImageProcessor*>(&qrdetector));
   cNode.Start();
@@ -63,7 +64,6 @@ ProcessingThread::ProcessingThread(SharedResource<cv_bridge::CvImageConstPtr> & 
   func(entry),
   running(true)
   {}
-
 void ProcessingThread::Run(){
   while(running){
    m_StartTime = time(0); //Logs the start time, so that we know when we started
