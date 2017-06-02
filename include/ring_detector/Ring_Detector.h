@@ -32,7 +32,7 @@ void TrackbarCallback(int pos, void * ptr){
   class Ring_Detector : public ImageProcessor {
 private:
 	const float UPDATE_RATE;
-	int minDist, minRadius, maxRadius, param1, param2;
+	int minDist, minRadius, maxRadius, param1, param2, minSaturation, minValue, hueValue, hueRange;
 	bool initialized;
 	int * dummy; //The trackbar needs a pointer even though the documentation marks it as "optional"
 public:
@@ -49,6 +49,10 @@ public:
 		initialized = false;
 		param1 = 100;
 		param2 = 100;
+		minSaturation = 100;
+		minValue = 50;
+		hueValue = 0;
+		hueRange = 15;
 	}
     
 };
