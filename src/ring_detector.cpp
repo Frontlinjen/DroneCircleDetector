@@ -103,7 +103,7 @@ void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
 	}
 	imshow("Drone Feed", droneFeed);
 	cv::waitKey(1);
-	
+	m_callOnFinish->Recieve(circleResult);
 }
 
 
