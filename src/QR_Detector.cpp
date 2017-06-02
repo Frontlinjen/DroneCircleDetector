@@ -17,12 +17,12 @@
 #include "ring_detector/MessageFormats.h"
 
 
-void QR_Detector::ProcessImage(const cv_bridge::CvImageConstPtr resource)
+void QR_Detector::ProcessImage(const Resource<cv_bridge::CvImageConstPtr> resource)
 {
-	if(resource.get() == NULL)
+	if(resource.resource.get() == NULL)
 			return;
 	cv::Mat img;
-	cv::cvtColor(resource->image,img,CV_BGR2GRAY);
+	cv::cvtColor(resource.resource->image,img,CV_BGR2GRAY);
 	img = img > 128;
 	zbar::Image imageToScan(img.cols, img.rows, "Y800", img.data, img.cols*img.rows);
 	int result = scanner.scan(imageToScan);

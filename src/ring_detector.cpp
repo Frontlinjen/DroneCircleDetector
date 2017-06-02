@@ -15,9 +15,9 @@
 #include "ring_detector/Ring_Detector.h"
 #include "ring_detector/MessageFormats.h"
 
-void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
+void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> resource)
 {
-	if(resource.get() == NULL)
+  if(resource.resource.get() == NULL)
 		return;
 	if(!initialized)
 	{
@@ -52,7 +52,7 @@ void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
 	cv::Mat abs_grad_x, abs_grad_y;
 
 	//Red scalling i HSV
-	cv::cvtColor(resource->image, droneFeed, CV_BGR2HSV);
+	cv::cvtColor(resource.resource->image, droneFeed, CV_BGR2HSV);
 	std::vector<cv::Mat> hsvChannels;
 	//Hue = 0, Saturation = 1, Value = 2
 	cv::split(droneFeed, hsvChannels);
@@ -88,7 +88,7 @@ void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
 	double dmaxRadius = maxRadius / 1.0;
 	cv::HoughCircles(hueMask, circles, CV_HOUGH_GRADIENT, 1, minDist, dparam1, dparam2, dminRadius, dmaxRadius);
         //cvtColor(resource->image, droneFeed, CV_BGR2GRAY); 
-	droneFeed = resource->image;
+	droneFeed = resource.resource->image;
 	CircleScanResult * circleResult = new CircleScanResult;
 	for(std::vector<cv::Vec3f>::iterator itr = circles.begin(); itr != circles.end(); ++itr )
 	{

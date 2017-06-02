@@ -52,7 +52,7 @@ public:
 		hueRange = 15;
 	}
 	
-	void ProcessImage(const cv_bridge::CvImageConstPtr resource) override;
+	void ProcessImage(const Resource<cv_bridge::CvImageConstPtr> resource) override;
     virtual ~Ring_Detector() override {
       cv::destroyWindow("Drone feed");
       delete m_default;
