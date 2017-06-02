@@ -39,16 +39,8 @@ class Ring_Detector : public ImageProcessor {
 public:
  Ring_Detector(RingEstimation* est) : UPDATE_RATE(120){
 	  m_callOnFinish = est;
-	}
-	
-	void ProcessImage(const cv_bridge::CvImageConstPtr resource) override;
-    virtual ~Ring_Detector() override {
-      cv::destroyWindow("Drone feed");
-      delete dummy;
-    }
-	Ring_Detector() : UPDATE_RATE(120){
-		dummy = new int(1);
-       	minDist = 1;
+	  dummy = new int(1);
+	  minDist = 1;
 		minRadius = 100;
 		maxRadius = 100;
 		initialized = false;
@@ -59,5 +51,11 @@ public:
 		hueValue = 0;
 		hueRange = 15;
 	}
+	
+	void ProcessImage(const cv_bridge::CvImageConstPtr resource) override;
+    virtual ~Ring_Detector() override {
+      cv::destroyWindow("Drone feed");
+      delete dummy;
+    }	
     
 };

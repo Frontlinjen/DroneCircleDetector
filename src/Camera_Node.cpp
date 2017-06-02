@@ -18,7 +18,7 @@ void Camera_Node::RegisterCallback(ProcessImageCallback c){
 //Thread safe
 void Camera_Node::ImageCallback(const sensor_msgs::ImageConstPtr & msg)
 {
-  currentImage.Set(cv_bridge::toCvShare(msg));
+  currentImage.Set(cv_bridge::toCvShare(msg,"bgr8"));
 }
 
 
