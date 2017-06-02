@@ -26,7 +26,7 @@ void QR_Detector::ProcessImage(const cv_bridge::CvImageConstPtr resource)
 	img = img > 128;
 	zbar::Image imageToScan(img.cols, img.rows, "Y800", img.data, img.cols*img.rows);
 	int result = scanner.scan(imageToScan);
-	QRScanResult * qrResult = new QRScanResult();
+	QRScanResult * qrResult = new QRScanResult;
 	for(zbar::Image::SymbolIterator itr = imageToScan.symbol_begin(); itr != imageToScan.symbol_end(); ++itr){
 		qrResult->objects.emplace_back();
 		QRData * data = &qrResult->objects.back();
@@ -73,6 +73,5 @@ void QR_Detector::ProcessImage(const cv_bridge::CvImageConstPtr resource)
 
 	}
 	imageToScan.set_data(NULL, 0);
-	m_callOnFinish->Recieve(qrResult);
 }
 
