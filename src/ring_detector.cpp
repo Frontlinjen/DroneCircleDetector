@@ -29,10 +29,10 @@ void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
 		cv::createTrackbar("param2", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &param2);
 		cv::createTrackbar("minRadius", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &minRadius);
 		cv::createTrackbar("maxRadius", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &maxRadius);
-		cv::createTrackbar("minSaturation", "Input feed", dummy, 300, TrackbarCallback<int, 50, 300>, &minSaturation);
+		cv::createTrackbar("minSaturation", "Input feed", dummy, 300, TrackbarCallback<int, 100, 300>, &minSaturation);
 		cv::createTrackbar("minValue", "Input feed", dummy, 300, TrackbarCallback<int, 50, 300>, &minValue);
-		cv::createTrackbar("hueValue", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &hueValue);
-		cv::createTrackbar("hueRange", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &hueRange);
+		cv::createTrackbar("hueValue", "Input feed", dummy, 300, TrackbarCallback<int, 0, 300>, &hueValue);
+		cv::createTrackbar("hueRange", "Input feed", dummy, 300, TrackbarCallback<int, 15, 300>, &hueRange);
 		initialized = true;
 	}
 	cv::Mat grad;
