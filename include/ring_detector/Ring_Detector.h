@@ -34,13 +34,13 @@ class Ring_Detector : public ImageProcessor {
 	const float UPDATE_RATE;
 	int minDist, minRadius, maxRadius, param1, param2, minSaturation, minValue, hueValue, hueRange;
 	bool initialized;
-	int * dummy; //The trackbar needs a pointer even though the documentation marks it as "optional"
+	int * m_default; //The trackbar needs a pointer even though the documentation marks it as "optional"
 	RingEstimation * m_callOnFinish; //Object which gathers information from QR and Image
 public:
  Ring_Detector(RingEstimation* est) : UPDATE_RATE(120){
 	  m_callOnFinish = est;
-	  dummy = new int(1);
-	  minDist = 1;
+	  m_default = new int(1);
+	  minDist = 150;
 		minRadius = 100;
 		maxRadius = 100;
 		initialized = false;
@@ -55,7 +55,7 @@ public:
 	void ProcessImage(const cv_bridge::CvImageConstPtr resource) override;
     virtual ~Ring_Detector() override {
       cv::destroyWindow("Drone feed");
-      delete dummy;
+      delete m_default;
     }	
     
 };
