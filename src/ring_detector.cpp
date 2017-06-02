@@ -29,6 +29,10 @@ void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
 		cv::createTrackbar("param2", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &param2);
 		cv::createTrackbar("minRadius", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &minRadius);
 		cv::createTrackbar("maxRadius", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &maxRadius);
+		cv::createTrackbar("minSaturation", "Input feed", dummy, 300, TrackbarCallback<int, 50, 300>, &minSaturation);
+		cv::createTrackbar("minValue", "Input feed", dummy, 300, TrackbarCallback<int, 50, 300>, &minValue);
+		cv::createTrackbar("hueValue", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &hueValue);
+		cv::createTrackbar("hueRange", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &hueRange);
 		initialized = true;
 	}
 	cv::Mat grad;
@@ -39,7 +43,36 @@ void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
 	cv::Mat droneFeed;
 	cv::Mat grad_x, grad_y;
 	cv::Mat abs_grad_x, abs_grad_y;
-	cv::cvtColor(resource->image, droneFeed, CV_BGR2GRAY);
+
+	//Red scalling i HSV
+	cv::cvtColor(resource->image, droneFeed, CV_BGR2HSV);
+	std::vector<cv::Mat> hsvChannels;
+	cv::split(droneFeed, hsvChannels);
+    cv::Mat hueImage = hsvChannels[0];
+    cv::Mat hueMask;
+//  int hueValue = 0; // rød
+//  int hueRange = 15;
+    // min sat = 50
+    // min val = 50
+    // hue val = 120
+    // range =10/15
+    cv::inRange(hueImage, hueValue - hueRange, hueValue + hueRange, hueMask);
+    //Tjek om farven er indenfor vores Huerange*
+    if (hueValue - hueRange < 0 || hueValue + hueRange > 180)
+    {
+    	cv::Mat hueMaskUpper;
+        int upperHueValue = hueValue + 180;
+        cv::inRange(hueImage, upperHueValue - hueRange, upperHueValue + hueRange, hueMaskUpper);
+        hueMask = hueMask | hueMaskUpper;
+    }
+    //Vi sortere resten fra
+    cv::Mat saturationMask = hsvChannels[1] > minSaturation;
+    cv::Mat valueMask = hsvChannels[2] > minValue;
+    hueMask = (hueMask & saturationMask) & valueMask;
+    cv::imshow("red", hueMask);
+
+    //Circle detection
+    cv::cvtColor(resource->image, droneFeed, CV_BGR2GRAY);
 	cv::GaussianBlur(droneFeed, droneFeed, cv::Size(9, 9), 1, 1, cv::BORDER_DEFAULT );
 	cv::Sobel(droneFeed, grad_x, CV_32FC1, 1, 0, 3);
 	convertScaleAbs( grad_x, abs_grad_x );
