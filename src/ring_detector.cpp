@@ -15,24 +15,31 @@
 #include "ring_detector/Ring_Detector.h"
 #include "ring_detector/MessageFormats.h"
 
-void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
+void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> resource)
 {
-	if(resource.get() == NULL)
+  if(resource.resource.get() == NULL)
 		return;
 	if(!initialized)
 	{
 
 		cv::namedWindow("Drone feed", CV_WINDOW_NORMAL);
 		cv::namedWindow("Input feed", CV_WINDOW_NORMAL);
-		cv::createTrackbar("minDist", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &minDist);
-		cv::createTrackbar("param1", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &param1);
-		cv::createTrackbar("param2", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &param2);
-		cv::createTrackbar("minRadius", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &minRadius);
-		cv::createTrackbar("maxRadius", "Input feed", dummy, 300, TrackbarCallback<int, 1, 300>, &maxRadius);
-		cv::createTrackbar("minSaturation", "Input feed", dummy, 300, TrackbarCallback<int, 100, 300>, &minSaturation);
-		cv::createTrackbar("minValue", "Input feed", dummy, 300, TrackbarCallback<int, 50, 300>, &minValue);
-		cv::createTrackbar("hueValue", "Input feed", dummy, 300, TrackbarCallback<int, 0, 300>, &hueValue);
-		cv::createTrackbar("hueRange", "Input feed", dummy, 300, TrackbarCallback<int, 15, 300>, &hueRange);
+
+      
+		cv::createTrackbar("minDist", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &minDist);
+		
+		cv::createTrackbar("param1", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &param1);
+		cv::createTrackbar("param2", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &param2);
+		cv::createTrackbar("minRadius", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &minRadius);
+		cv::createTrackbar("maxRadius", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &maxRadius);
+		*m_default = 50;
+		cv::createTrackbar("minSaturation", "Input feed", m_default, 300, TrackbarCallback<int, 100, 300>, &minSaturation);
+		*m_default = 50;
+		cv::createTrackbar("minValue", "Input feed", m_default, 300, TrackbarCallback<int, 50, 300>, &minValue);
+		*m_default = 0;
+		cv::createTrackbar("hueValue", "Input feed", m_default, 300, TrackbarCallback<int, 0, 300>, &hueValue);
+		*m_default = 10;
+		cv::createTrackbar("hueRange", "Input feed", m_default, 300, TrackbarCallback<int, 15, 300>, &hueRange);
 		initialized = true;
 	}
 	cv::Mat grad;
@@ -45,24 +52,19 @@ void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
 	cv::Mat abs_grad_x, abs_grad_y;
 
 	//Red scalling i HSV
-	cv::cvtColor(resource->image, droneFeed, CV_BGR2HSV);
+	cv::cvtColor(resource.resource->image, droneFeed, CV_BGR2HSV);
 	std::vector<cv::Mat> hsvChannels;
+	//Hue = 0, Saturation = 1, Value = 2
 	cv::split(droneFeed, hsvChannels);
     cv::Mat hueImage = hsvChannels[0];
     cv::Mat hueMask;
-//  int hueValue = 0; // rød
-//  int hueRange = 15;
-    // min sat = 50
-    // min val = 50
-    // hue val = 120
-    // range =10/15
     cv::inRange(hueImage, hueValue - hueRange, hueValue + hueRange, hueMask);
     //Tjek om farven er indenfor vores Huerange*
     if (hueValue - hueRange < 0 || hueValue + hueRange > 180)
     {
     	cv::Mat hueMaskUpper;
-        int upperHueValue = hueValue + 180;
-        cv::inRange(hueImage, upperHueValue - hueRange, upperHueValue + hueRange, hueMaskUpper);
+        int upperHueValue = 180 + (hueValue - hueRange);
+        cv::inRange(hueImage, upperHueValue, 180, hueMaskUpper);
         hueMask = hueMask | hueMaskUpper;
     }
     //Vi sortere resten fra
@@ -85,7 +87,8 @@ void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
 	double dminRadius = minRadius / 1.0;
 	double dmaxRadius = maxRadius / 1.0;
 	cv::HoughCircles(hueMask, circles, CV_HOUGH_GRADIENT, 1, minDist, dparam1, dparam2, dminRadius, dmaxRadius);
-        droneFeed = resource->image;
+        //cvtColor(resource->image, droneFeed, CV_BGR2GRAY); 
+	droneFeed = resource.resource->image;
 	CircleScanResult * circleResult = new CircleScanResult;
 	for(std::vector<cv::Vec3f>::iterator itr = circles.begin(); itr != circles.end(); ++itr )
 	{
@@ -103,7 +106,11 @@ void Ring_Detector:: ProcessImage(const cv_bridge::CvImageConstPtr resource)
 		data->y = center.y;
 	}
 	imshow("Drone Feed", droneFeed);
-	cv::waitKey(1);
+	char c = cv::waitKey(1);
+	if(c == 27){
+		ros::shutdown();
+		cv::destroyAllWindows();
+	}
 	m_callOnFinish->Recieve(circleResult);
 }
 

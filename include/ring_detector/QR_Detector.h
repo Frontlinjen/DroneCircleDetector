@@ -33,7 +33,7 @@ class QR_Detector : public ImageProcessor{
 	QR_Detector(RingEstimation* callback){
 	  m_callOnFinish = callback;
 	}
-	void ProcessImage(const cv_bridge::CvImageConstPtr resource) override;
+	void ProcessImage(const Resource<cv_bridge::CvImageConstPtr> resource) override;
 		virtual ~QR_Detector() override {
 		      cv::destroyWindow("MyVideo");
 		    }
