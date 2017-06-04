@@ -26,12 +26,12 @@ void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> res
 		cv::namedWindow("Input feed", CV_WINDOW_NORMAL);
 
       
-		cv::createTrackbar("minDist", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &minDist);
+		//cv::createTrackbar("minDist", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &minDist);
 		
 		cv::createTrackbar("param1", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &param1);
 		cv::createTrackbar("param2", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &param2);
-		cv::createTrackbar("minRadius", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &minRadius);
-		cv::createTrackbar("maxRadius", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &maxRadius);
+		//cv::createTrackbar("minRadius", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &minRadius);
+		//cv::createTrackbar("maxRadius", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &maxRadius);
 		*m_default = 50;
 		cv::createTrackbar("minSaturation", "Input feed", m_default, 300, TrackbarCallback<int, 100, 300>, &minSaturation);
 		*m_default = 50;
@@ -40,6 +40,14 @@ void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> res
 		cv::createTrackbar("hueValue", "Input feed", m_default, 300, TrackbarCallback<int, 0, 300>, &hueValue);
 		*m_default = 10;
 		cv::createTrackbar("hueRange", "Input feed", m_default, 300, TrackbarCallback<int, 15, 300>, &hueRange);
+		*m_default = 40;
+		cv::createTrackbar("treshold", "Input feed", m_default, 300, TrackbarCallback<int, 0, 300>, &treshold);
+		*m_default = 10;
+		cv::createTrackbar("minLength", "Input feed", m_default, 300, TrackbarCallback<int, 0, 300>, &minLength);
+		*m_default = 10;
+		cv::createTrackbar("maxGap", "Input feed", m_default, 300, TrackbarCallback<int, 0, 300>, &maxGap);
+		*m_default = 15;
+		cv::createTrackbar("lineParam", "Input feed", m_default, 300, TrackbarCallback<int, 0, 300>, &lineParam);
 		initialized = true;
 	}
 	cv::Mat grad;
@@ -81,16 +89,16 @@ void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> res
 	convertScaleAbs( grad_y, abs_grad_y );
 	cv::Sobel(droneFeed, grad_y, CV_32FC1, 0, 1, 3);*/
 	std::vector<cv::Vec4i> circles;
-	double dminDist = minDist / 1.0;
+	//double dminDist = minDist / 1.0;
 	double dparam1 = param1 / 1.0;
 	double dparam2 = param2 / 1.0;
-	double dminRadius = minRadius / 1.0;
-	double dmaxRadius = maxRadius / 1.0;
+	//double dminRadius = minRadius / 1.0;
+	//double dmaxRadius = maxRadius / 1.0;
 	//cv::HoughCircles(hueMask, circles, CV_HOUGH_GRADIENT, 1, minDist, dparam1, dparam2, dminRadius, dmaxRadius);
         //cvtColor(resource->image, droneFeed, CV_BGR2GRAY);
 	cv::Mat binaryImage;
 	cv::Canny(hueMask, binaryImage, dparam1, dparam2, 3);
-	cv::HoughLinesP(binaryImage, circles, 1, CV_PI/180.0, 10, 4, 10);
+	cv::HoughLinesP(binaryImage, circles, 1, (CV_PI/180.0)*lineParam, treshold, minLength, maxGap);
 	droneFeed = resource.resource->image;
 	CircleScanResult * circleResult = new CircleScanResult;
 	for(std::vector<cv::Vec4i>::iterator itr = circles.begin(); itr != circles.end(); ++itr )

@@ -19,8 +19,7 @@
 #include "ImageProcessor.h"
 #include "RingEstimation.h"
 
-constexpr int width = 900;
-constexpr float constant = 542.2222222222;
+
 
 template<typename T, int MIN=0, int MAX=50, int RATIO=1>
 void TrackbarCallback(int pos, void * ptr){
@@ -34,7 +33,6 @@ void TrackbarCallback(int pos, void * ptr){
 class Ring_Detector : public ImageProcessor {
 	const float UPDATE_RATE;
 	int param1, param2, minSaturation, minValue, hueValue, hueRange, treshold, minLength, maxGap, lineParam;
-	float distance = 0;
 	bool initialized;
 	int * m_default; //The trackbar needs a pointer even though the documentation marks it as "optional"
 	RingEstimation * m_callOnFinish; //Object which gathers information from QR and Image
