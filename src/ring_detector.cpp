@@ -94,20 +94,23 @@ void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> res
 	for(std::vector<cv::Vec3f>::iterator itr = circles.begin(); itr != circles.end(); ++itr )
 	{
 		circleResult->objects.emplace_back();
-		CircleData * data = &circleResult->objects.back();
 		cv::Point center(cvRound((*itr)[0]), cvRound((*itr)[1]));
 		int radius = cvRound((*itr)[2]);
 		// draw the circle center
 		cv::circle(droneFeed, center, 3, cv::Scalar(255,255,255), -1, 8, 0);
 		// draw the circle outline
 		cv::circle(droneFeed, center, radius, cv::Scalar(255,0,255), 3, 8, 0);
-		data->radius = radius;
-		data->angle = 0;
-		data->x = center.x;
-		data->y = center.y;
 		int pixels = radius*2;
 		distance = (width * constant) / pixels;
 		std::cout << "Ring-Distance: " << distance << std::endl;
+		if(distance <4000){
+			CircleData * data = &circleResult->objects.back();
+			data->radius = radius;
+			data->angle = 0;
+			data->x = center.x;
+			data->y = center.y;
+
+		}
 	}
 
 	imshow("Drone Feed", droneFeed);
