@@ -90,6 +90,7 @@ void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> res
         //cvtColor(resource->image, droneFeed, CV_BGR2GRAY); 
 	droneFeed = resource.resource->image;
 	CircleScanResult * circleResult = new CircleScanResult;
+
 	for(std::vector<cv::Vec3f>::iterator itr = circles.begin(); itr != circles.end(); ++itr )
 	{
 		circleResult->objects.emplace_back();
@@ -104,7 +105,11 @@ void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> res
 		data->angle = 0;
 		data->x = center.x;
 		data->y = center.y;
+		int pixels = radius*2;
+		distance = (width * constant) / pixels;
+		std::cout << "Ring-Distance: " << distance << std::endl;
 	}
+
 	imshow("Drone Feed", droneFeed);
 	char c = cv::waitKey(1);
 	if(c == 27){
