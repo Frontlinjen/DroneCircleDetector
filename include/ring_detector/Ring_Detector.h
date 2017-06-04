@@ -23,26 +23,23 @@
 
 template<typename T, int MIN=0, int MAX=50, int RATIO=1>
 void TrackbarCallback(int pos, void * ptr){
-    if(pos < MIN || pos > MAX)
-        return;
-    double ratio = 1/RATIO;
-    T * val = static_cast<T*>(ptr);
-    *val = pos*RATIO;
+	if(pos < MIN || pos > MAX)
+		return;
+	double ratio = 1/RATIO;
+	T * val = static_cast<T*>(ptr);
+	*val = pos*RATIO;
 }
 
 class Ring_Detector : public ImageProcessor {
 	const float UPDATE_RATE;
-	int minDist, minRadius, maxRadius, param1, param2, minSaturation, minValue, hueValue, hueRange;
+	int param1, param2, minSaturation, minValue, hueValue, hueRange, treshold, minLength, maxGap, lineParam;
 	bool initialized;
 	int * m_default; //The trackbar needs a pointer even though the documentation marks it as "optional"
 	RingEstimation * m_callOnFinish; //Object which gathers information from QR and Image
 public:
- Ring_Detector(RingEstimation* est) : UPDATE_RATE(120){
-	  m_callOnFinish = est;
-	  m_default = new int(1);
-	  minDist = 150;
-		minRadius = 100;
-		maxRadius = 100;
+	Ring_Detector(RingEstimation* est) : UPDATE_RATE(120){
+		m_callOnFinish = est;
+		m_default = new int(1);
 		initialized = false;
 		param1 = 100;
 		param2 = 100;
@@ -50,6 +47,10 @@ public:
 		minValue = 50;
 		hueValue = 0;
 		hueRange = 15;
+		treshold = 40;
+		minLength = 10;
+		maxGap = 10;
+		lineParam = 1;
 	}
 	
 	void ProcessImage(const Resource<cv_bridge::CvImageConstPtr> resource) override;
