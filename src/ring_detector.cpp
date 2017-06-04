@@ -80,30 +80,23 @@ void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> res
 	convertScaleAbs( grad_x, abs_grad_x );
 	convertScaleAbs( grad_y, abs_grad_y );
 	cv::Sobel(droneFeed, grad_y, CV_32FC1, 0, 1, 3);*/
-	std::vector<cv::Vec3f> circles;
+	std::vector<cv::Vec4i> circles;
 	double dminDist = minDist / 1.0;
 	double dparam1 = param1 / 1.0;
 	double dparam2 = param2 / 1.0;
 	double dminRadius = minRadius / 1.0;
 	double dmaxRadius = maxRadius / 1.0;
-	cv::HoughCircles(hueMask, circles, CV_HOUGH_GRADIENT, 1, minDist, dparam1, dparam2, dminRadius, dmaxRadius);
-        //cvtColor(resource->image, droneFeed, CV_BGR2GRAY); 
+	//cv::HoughCircles(hueMask, circles, CV_HOUGH_GRADIENT, 1, minDist, dparam1, dparam2, dminRadius, dmaxRadius);
+        //cvtColor(resource->image, droneFeed, CV_BGR2GRAY);
+	cv::Mat binaryImage;
+	cv::Canny(hueMask, binaryImage, dparam1, dparam2, 3);
+	cv::HoughLinesP(binaryImage, circles, 1, CV_PI/180.0, 10, 4, 10);
 	droneFeed = resource.resource->image;
 	CircleScanResult * circleResult = new CircleScanResult;
-	for(std::vector<cv::Vec3f>::iterator itr = circles.begin(); itr != circles.end(); ++itr )
+	for(std::vector<cv::Vec4i>::iterator itr = circles.begin(); itr != circles.end(); ++itr )
 	{
-		circleResult->objects.emplace_back();
-		CircleData * data = &circleResult->objects.back();
-		cv::Point center(cvRound((*itr)[0]), cvRound((*itr)[1]));
-		int radius = cvRound((*itr)[2]);
-		// draw the circle center
-		cv::circle(droneFeed, center, 3, cv::Scalar(255,255,255), -1, 8, 0);
-		// draw the circle outline
-		cv::circle(droneFeed, center, radius, cv::Scalar(255,0,255), 3, 8, 0);
-		data->radius = radius;
-		data->angle = 0;
-		data->x = center.x;
-		data->y = center.y;
+	  cv::Vec4i line = *itr;
+	  cv::line(droneFeed, cv::Point(line[0], line[1]), cv::Point(line[2], line[3]), cv::Scalar(0,0,0), 3, CV_AA);
 	}
 	imshow("Drone Feed", droneFeed);
 	char c = cv::waitKey(1);
