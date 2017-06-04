@@ -20,8 +20,11 @@
 #include <zbar.h>
 #include "RingEstimation.h"
 
-constexpr int width = 194; //214 when testing
-constexpr float constant = 561.2244897959; //514.0186915888 when testing
+constexpr int widthWall = 214;
+constexpr int widthRing = 194;
+constexpr float constantWall = 514.0186915888;
+constexpr float constantRing = 561.2244897959;
+
 class QR_Detector : public ImageProcessor{
 	zbar::ImageScanner scanner;
 	float deltaDistance = 0;

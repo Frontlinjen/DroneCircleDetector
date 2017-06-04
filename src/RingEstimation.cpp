@@ -32,6 +32,7 @@ void RingEstimation::Run(){
 }
 
 void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
+	CircleData *data = new CircleData();
 
 	for(std::vector<CircleData>::iterator itr = circles->objects.begin(); itr != circles->objects.end(); ++itr){
 
