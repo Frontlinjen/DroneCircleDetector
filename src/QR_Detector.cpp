@@ -43,8 +43,8 @@ void QR_Detector::ProcessImage(const Resource<cv_bridge::CvImageConstPtr> resour
 			cv::line(img, pts[i], pts[(i+1)%4],cv::Scalar(255,0,0),3);
 		}
 		int pixels = r.size.width;
+		std::cout << r.size.width << std::endl;
 		std::cout << "Angle: " << r.angle << std::endl;
-		std::cout << "Distance: " << deltaDistance << std::endl;
 		if(itr->get_data().at(0) == 'p' || itr->get_data().at(0) == 'P')
 		{
 			data->ring_number = std::atoi(&itr->get_data().at(3));
@@ -66,6 +66,7 @@ void QR_Detector::ProcessImage(const Resource<cv_bridge::CvImageConstPtr> resour
 				break;
 			}
 		}
+		std::cout << "QR-Distance: " << deltaDistance << std::endl;
 		data->angle = r.angle;
 		data->distance = deltaDistance;
 		data->x = r.center.x;
