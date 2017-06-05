@@ -8,6 +8,7 @@
 #include "ring_detector/RingEstimation.h"
 #include <iostream>
 #include <opencv2/core/ocl.hpp>
+#include <cmath>
 //Not thread safe
 void Camera_Node::RegisterCallback(ProcessImageCallback c){
   m_Jobs.emplace_back(currentImage, c);
@@ -18,7 +19,21 @@ void Camera_Node::RegisterCallback(ProcessImageCallback c){
 //Thread safe
 void Camera_Node::ImageCallback(const sensor_msgs::ImageConstPtr & msg)
 {
-  currentImage.Set(cv_bridge::toCvShare(msg,"bgr8"));
+	boost::shared_ptr<cv_bridge::CvImage> bridge = cv_bridge::toCvCopy(msg, "bgr8");
+	//FISH EYE CORRECTION
+		cv::Mat *img = &(bridge->image);
+		cv::Mat distImage(img->rows, img->cols, CV_32F);
+		float data[9] = {
+				561.999146, 0, 307.433982,
+				0, 561.782697, 190.144373,
+				0, 0, 1};
+
+		std::vector<float> d {-0.50758, 0.24911, 0.000579, 0.000996, 0};
+		cv::Mat k = cv::Mat(3, 3, CV_32FC1, &data);
+		cv::undistort(*img, distImage, k, d);
+		*img = distImage;
+	//Vi deler billedet med alle andre
+	currentImage.Set(bridge);
 }
 
 
