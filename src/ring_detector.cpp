@@ -109,7 +109,7 @@ void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> res
 			data->angle = 0;
 			data->x = center.x;
 			data->y = center.y;
-
+			data->distance = distance;
 		}
 	}
 
