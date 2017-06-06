@@ -48,16 +48,19 @@ ProcessImage(circle, QR);
 
 void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
 	CircleData *Circledata = new CircleData();
-	QRData *QRdata = new QRData();
-	time_t timev;
-	for(std::vector<QRData>::iterator itr = QR->objects.begin(); itr != QR->objects.end(); ++itr){
-		QRdata->x;
-	}
+	//QRData *QRdata = new QRData();
+	RingData *ringData = new RingData();
+	//time_t timev;
+	/*for(std::vector<QRData>::iterator itr = QR->objects.begin(); itr != QR->objects.end(); ++itr){
+		ringData->delta_x = QRdata->x;
+		ringData->delta_y = QRdata->y;
+	}*/
 
 	for(std::vector<CircleData>::iterator itr = circles->objects.begin(); itr != circles->objects.end(); ++itr){
-		RingData *ringData = new RingData();
-		ringData->delta_x = Circledata->x;
-		ringData->delta_y = Circledata->y;
+		//RingData *ringData = new RingData();
+		ringData->abs_x = 0;
+		ringData->abs_z = 0;
+		ringData->abs_y = Circledata->distance;
 		//ringData->abs_x = drone->x - ringData->delta_x;
 		//ringData->abs_y = drone->y - ringData->delta_y;
 		/*float i_x = ringData->abs_x - QRdata->x;
@@ -66,12 +69,14 @@ void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
 			ringData->ring_number = QRdata->ring_number;
 			ringData->distance = QRdata->distance;
 		}*/
-		ringData->timestamp = std::time(&timev);
+		//ringData->timestamp = std::time(&timev);
 		/*if(RingData(ringData->abs_x, ringData->abs_y) != null){
 			ringData->viewcount = ringData->viewcount + 1;
 		}else
 			ringData->viewcount = 1;*/
-
+		if(m_Bucket.Get(ringData->abs_x, ringData->abs_y)->empty()){
+			m_Bucket.Insert(ringData);
+		}
 	}
 
 	delete circles;

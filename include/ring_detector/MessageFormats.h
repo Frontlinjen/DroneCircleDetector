@@ -6,6 +6,7 @@ struct CircleData{
   unsigned int x, y;
   unsigned int radius;
   float angle;
+  float distance;
 };
 
 struct QRData{
