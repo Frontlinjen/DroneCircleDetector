@@ -29,15 +29,23 @@ class QR_Detector : public ImageProcessor{
 	zbar::ImageScanner scanner;
 	float deltaDistance = 0;
 	RingEstimation* m_callOnFinish;
- public:
+public:
 	QR_Detector(RingEstimation* callback){
-	  m_callOnFinish = callback;
+		m_callOnFinish = callback;
+	}
+	float Scalarproduct(cv::Vec2f a, cv::Vec2f b){
+		float i = (a[0] * b[0]) + (a[1] * b[1]);
+		return i;
+	}
+	float Pythagoras(cv::Vec2f a, cv::Vec2f b){
+		float i = sqrt((pow(a[0], 2) + pow(a[1], 2))) * sqrt((pow(b[0], 2) + pow(b[1], 2)));
+		return i;
 	}
 	void ProcessImage(const Resource<cv_bridge::CvImageConstPtr> resource) override;
-		virtual ~QR_Detector() override {
-		      cv::destroyWindow("MyVideo");
-		    }
-		QR_Detector(){
-			scanner.set_config(zbar::ZBAR_NONE, zbar::ZBAR_CFG_ENABLE, 1);
-		}
+	virtual ~QR_Detector() override {
+		cv::destroyWindow("MyVideo");
+	}
+	QR_Detector(){
+		scanner.set_config(zbar::ZBAR_NONE, zbar::ZBAR_CFG_ENABLE, 1);
+	}
 };
