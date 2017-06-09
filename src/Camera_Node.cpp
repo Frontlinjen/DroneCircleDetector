@@ -32,12 +32,33 @@ void Camera_Node::ImageCallback(const sensor_msgs::ImageConstPtr & msg)
 		std::vector<float> d {-0.50758, 0.24911, 0.000579, 0.000996, 0};
 		cv::Mat k = cv::Mat(3, 3, CV_32FC1, &data);
 		cv::undistort(*img, distImage, k, d);
+		//Histogram manipulation
+		equalize(distImage);
 		//White balance
-		//WhiteBalance(distImage, 50.0, distImage);
+		//WhiteBalance(distImage, 4.0, distImage);
 		*img = distImage;
 	//Vi deler billedet med alle andre
 	currentImage.Set(bridge);
 }
+void Camera_Node::equalize(const cv::Mat& in)
+{
+    if(in.channels() >= 3)
+    {
+        cv::Mat ycrcb;
+
+        cv::cvtColor(in,ycrcb,CV_BGR2YCrCb);
+
+        std::vector<cv::Mat> channels;
+        cv::split(ycrcb,channels);
+
+        cv::equalizeHist(channels[0], channels[0]);
+
+        cv::merge(channels,ycrcb);
+
+        cvtColor(ycrcb,in,CV_YCrCb2BGR);
+    }
+}
+
 void Camera_Node::WhiteBalance(const cv::Mat& in, float percentage, cv::Mat& out){
 	assert(in.channels() == 3);
 	assert(percentage > 0 && percentage < 100);
@@ -62,8 +83,6 @@ void Camera_Node::WhiteBalance(const cv::Mat& in, float percentage, cv::Mat& out
 	}
 	merge(tmpsplit,out);
 }
-
-
 
 int main(int argc, char ** argv){
   ros::init(argc, argv, "RingDetector");
