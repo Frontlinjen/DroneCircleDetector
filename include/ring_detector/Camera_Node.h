@@ -22,6 +22,7 @@ class Camera_Node{
   void Start();
   void ImageCallback(const sensor_msgs::ImageConstPtr & img);
   void RegisterCallback(ProcessImageCallback c);
+  void WhiteBalance(const cv::Mat& in, float percentage, cv::Mat& out);
   Camera_Node() : it(nodeHandle)
      {
         sub = it.subscribe<Camera_Node>("ardrone/front/image_raw", 60, &Camera_Node::ImageCallback, this);

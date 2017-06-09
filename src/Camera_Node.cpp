@@ -9,6 +9,7 @@
 #include <iostream>
 #include <opencv2/core/ocl.hpp>
 #include <cmath>
+#include <opencv2/core.hpp>
 //Not thread safe
 void Camera_Node::RegisterCallback(ProcessImageCallback c){
   m_Jobs.emplace_back(currentImage, c);
@@ -31,9 +32,35 @@ void Camera_Node::ImageCallback(const sensor_msgs::ImageConstPtr & msg)
 		std::vector<float> d {-0.50758, 0.24911, 0.000579, 0.000996, 0};
 		cv::Mat k = cv::Mat(3, 3, CV_32FC1, &data);
 		cv::undistort(*img, distImage, k, d);
+		//White balance
+		//WhiteBalance(distImage, 50.0, distImage);
 		*img = distImage;
 	//Vi deler billedet med alle andre
 	currentImage.Set(bridge);
+}
+void Camera_Node::WhiteBalance(const cv::Mat& in, float percentage, cv::Mat& out){
+	assert(in.channels() == 3);
+	assert(percentage > 0 && percentage < 100);
+
+	float half_percent = percentage / 200.0f;
+
+	std::vector<cv::Mat> tmpsplit;
+	split(in,tmpsplit);
+	for(int i=0;i<3;i++) {
+		//Vi finder ekstremerne
+		cv::Mat flat; tmpsplit[i].reshape(1,1).copyTo(flat);
+		cv::sort(flat,flat,CV_SORT_EVERY_ROW + CV_SORT_ASCENDING);
+		int lowval = flat.at<uchar>(cvFloor(((float)flat.cols) * half_percent));
+		int highval = flat.at<uchar>(cvCeil(((float)flat.cols) * (1.0 - half_percent)));
+		std::cout << lowval << " " << highval << std::endl;
+		//Vi erstater vores ekstremer
+		tmpsplit[i].setTo(lowval,tmpsplit[i] < lowval);
+		tmpsplit[i].setTo(highval,tmpsplit[i] > highval);
+
+		//Vi normaliser vores channels
+		normalize(tmpsplit[i],tmpsplit[i],0,255,cv::NORM_MINMAX);
+	}
+	merge(tmpsplit,out);
 }
 
 
