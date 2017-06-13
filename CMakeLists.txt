@@ -180,7 +180,7 @@ include_directories(
 # )
 
 include_directories(include ${catkin_INCLUDE_DIRS})
-add_executable(ring_detector src/ring_detector.cpp src/Camera_Node.cpp src/QR_Detector.cpp src/Drone_Recorder.cpp src/RingBucket.cpp src/RingEstimation.cpp)
+add_executable(ring_detector src/ring_detector.cpp src/Camera_Node.cpp src/QR_Detector.cpp src/Drone_Recorder.cpp src/RingBucket.cpp src/RingEstimation.cpp src/kdtree.cpp)
 #target_compile_options(ring_detector PUBLIC -lpthread)
 #target_link_libraries(ring_detector ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(ring_detector ${catkin_LIBRARIES})
@@ -198,9 +198,9 @@ target_link_libraries(ring_detector zbar)
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_ring_detector.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
+catkin_add_gtest(utest tests/kdtree.cpp src/kdtree.cpp)
+#f(TARGET ${PROJECT_NAME}-test)
+#target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
 
 ## Add folders to be run by python nosetests
