@@ -1,13 +1,4 @@
 #include "ring_detector/RingEstimation.h"
-#include "ros/ros.h"
-#include "std_msgs/String.h"
-
-
-RingEstimation::RingEstimation(ros::NodeHandle n){
-	ros::Publisher pub = n.advertise<std_msgs::String>("chatter", 1000);
-
-}
-
 void RingEstimation::Recieve(CircleScanResult* result){
 	{
 		std::lock_guard<std::mutex> lock(m_lock);
@@ -25,37 +16,37 @@ void RingEstimation::Recieve(QRScanResult* result){
 }
 
 void RingEstimation::Run(){
-	m_Running = true;
-	while(m_Running){
-		CircleScanResult* circle = NULL;
-		QRScanResult* QR = NULL;
-		std::unique_lock<std::mutex> lock(m_lock);
-		m_cond.wait(lock, [this]()->bool{return m_CircleResults.size() > 1 && m_ScanResults.size() > 1;});
+  m_Running = true;
+  while(m_Running){
+    CircleScanResult* circle = NULL;
+    QRScanResult* QR = NULL;
+    std::unique_lock<std::mutex> lock(m_lock);
+    m_cond.wait(lock, [this]()->bool{return m_CircleResults.size() > 1 && m_ScanResults.size() > 1;});
 
-		circle = m_CircleResults.front();
-		QR = m_ScanResults.front();
-		if(circle->frameID != QR->frameID){
-			//We only process the most recent one
-			if(circle->frameID > QR->frameID){
-				circle = NULL;
-				m_ScanResults.pop_front();
-			}
-			else
-			{
-				QR = NULL;
-				m_CircleResults.pop_front();
-			}
-		}
-		else{
-			m_CircleResults.pop_front();
-			m_ScanResults.pop_front();
-		}
-		m_lock.unlock(); //No reason for us to hold onto the lock anymore.
-		ProcessImage(circle, QR);
-	}
+circle = m_CircleResults.front();
+QR = m_ScanResults.front();
+if(circle->frameID != QR->frameID){
+  //We only process the most recent one
+  if(circle->frameID > QR->frameID){
+    circle = NULL;
+    m_ScanResults.pop_front();
+  }
+  else
+  {
+    QR = NULL;
+    m_CircleResults.pop_front();
+  }
+}
+else{
+  m_CircleResults.pop_front();
+  m_ScanResults.pop_front();
+}
+m_lock.unlock(); //No reason for us to hold onto the lock anymore.
+ProcessImage(circle, QR);
+  }      
 }
 
-void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR) {
+void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
 	CircleData *Circledata = new CircleData();
 	//QRData *QRdata = new QRData();
 	RingData *ringData = new RingData();
