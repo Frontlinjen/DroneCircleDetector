@@ -42,7 +42,8 @@ int main(int argc, char ** argv){
   ros::init(argc, argv, "RingDetector");
   std::cout << "Using OpenCV: " << CV_VERSION << '\n';
   std::cout << "Supports OpenCL: " << cv::ocl::haveOpenCL() << '\n';
-  RingEstimation estimator;
+  ros::NodeHandle n;
+  RingEstimation estimator(n);
   Camera_Node cNode;
   Ring_Detector detector(&estimator);
   QR_Detector qrdetector(&estimator);
