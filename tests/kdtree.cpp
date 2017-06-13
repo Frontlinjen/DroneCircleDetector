@@ -18,7 +18,7 @@ void printTree(const kdNode* root){
 };
 
 TEST(KdTree, canBuildTree){
-  std::vector<kdPoint> points{{1, 2}, {3, 4}, {5, 6}, {7, 8}, {9, 10}, {11, 12}, {13, 14}, {15, 16}, {17, 18}, {19, 20}, {21, 22}, {23, 24}, {25, 26}, {27, 28}, {29, 30}};
+  std::vector<kdLeaf> points {{{1, 2}, NULL}, {{3, 4}, NULL}, {{5, 6}, NULL}, {{7, 8}, NULL}, {{9, 10}, NULL}, {{11, 12}, NULL}, {{13, 14}, NULL}, {{15, 16}, NULL}, {{17, 18}, NULL}, {{19, 20} ,NULL}, {{21, 22}, NULL}, {{23, 24}, NULL}, {{25, 26}, NULL}, {{27, 28}, NULL}, {{29, 30}, NULL}};
   kdTree tree;
   tree.buildTree(points);
   const kdNode * root = tree.getRoot();
@@ -27,7 +27,7 @@ TEST(KdTree, canBuildTree){
 
 
 TEST(KdTree, canSearchTree){
-  std::vector<kdPoint> points{{1, 2}, {3, 4}, {5, 6}, {7, 8}, {9, 10}, {11, 12}, {13, 14}, {15, 16}, {17, 18}, {19, 20}, {21, 22}, {23, 24}, {25, 26}, {27, 28}, {29, 30}};
+  std::vector<kdLeaf> points {{{1, 2}, NULL}, {{3, 4}, NULL}, {{5, 6}, NULL}, {{7, 8}, NULL}, {{9, 10}, NULL}, {{11, 12}, NULL}, {{13, 14}, NULL}, {{15, 16}, NULL}, {{17, 18}, NULL}, {{19, 20} ,NULL}, {{21, 22}, NULL}, {{23, 24}, NULL}, {{25, 26}, NULL}, {{27, 28}, NULL}, {{29, 30}, NULL}};
   kdTree tree;
   tree.buildTree(points);
 
@@ -35,7 +35,7 @@ TEST(KdTree, canSearchTree){
   r.center = kdPoint{15, 19};
   r.height = 5;
   r.width = 2;
-  std::vector<kdPoint> result = tree.InRange(r);
+  std::vector<kdLeaf> result = tree.InRange(r);
   EXPECT_EQ(3, result.size());
 }
 
