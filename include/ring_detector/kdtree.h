@@ -66,17 +66,17 @@ class kdTree{
 
  public:
   //0 = X-axis, 1 = Y-axis
-  typedef std::vector<kdPoint> PointContainer;
-  std::vector<kdPoint> InRange(Rect& rect);
+  typedef std::vector<kdLeaf> PointContainer;
+  std::vector<kdLeaf> InRange(Rect& rect);
   void buildTree(PointContainer& points);
   const kdNode* getRoot(){ return root; };
  private:
-  typedef bool (*Compare)(const kdPoint& first, const kdPoint& second);
-  kdNode* visitNode(kdPoint* points, std::size_t length, unsigned int depth);
-  unsigned int estimateMedian(kdPoint* points, std::size_t length, Compare comparetor);
+  typedef bool (*Compare)(const kdLeaf& first, const kdLeaf& second);
+  kdNode* visitNode(kdLeaf* points, std::size_t length, unsigned int depth);
+  unsigned int estimateMedian(kdLeaf* points, std::size_t length, Compare comparetor);
   template<bool splitX>
-  void searchNode(kdNode* node, Rect& parent, Rect& rect, std::vector<kdPoint>& locatedPoints);
-  void searchNode(kdNode* node, Rect& parent, Rect& rect, std::vector<kdPoint>& locatedPoints);
+  void searchNode(kdNode* node, Rect& parent, Rect& rect, std::vector<kdLeaf>& locatedPoints);
+  void searchNode(kdNode* node, Rect& parent, Rect& rect, std::vector<kdLeaf>& locatedPoints);
   
-  void collectPoints(kdNode* node, std::vector<kdPoint>& locatedPoints);
+  void collectPoints(kdNode* node, std::vector<kdLeaf>& locatedPoints);
 };
