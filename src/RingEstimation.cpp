@@ -1,4 +1,12 @@
 #include "ring_detector/RingEstimation.h"
+#include "ros/ros.h"
+#include "std_msgs/String.h"
+
+RingEstimation::RingEstimation(ros::NodeHandle n){
+	publisher = n.advertise<std_msgs::String>("circleData", 1000);
+}
+
+
 void RingEstimation::Recieve(CircleScanResult* result){
 	{
 		std::lock_guard<std::mutex> lock(m_lock);
