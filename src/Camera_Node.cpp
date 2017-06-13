@@ -9,7 +9,6 @@
 #include <iostream>
 #include <opencv2/core/ocl.hpp>
 #include <cmath>
-#include "std_msgs/String.h"
 //Not thread safe
 void Camera_Node::RegisterCallback(ProcessImageCallback c){
   m_Jobs.emplace_back(currentImage, c);
@@ -43,8 +42,7 @@ int main(int argc, char ** argv){
   ros::init(argc, argv, "RingDetector");
   std::cout << "Using OpenCV: " << CV_VERSION << '\n';
   std::cout << "Supports OpenCL: " << cv::ocl::haveOpenCL() << '\n';
-  ros::NodeHandle n;
-  RingEstimation estimator(n);
+  RingEstimation estimator;
   Camera_Node cNode;
   Ring_Detector detector(&estimator);
   QR_Detector qrdetector(&estimator);

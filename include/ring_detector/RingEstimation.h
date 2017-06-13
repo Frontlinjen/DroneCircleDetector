@@ -4,7 +4,6 @@
 #include <deque>
 #include <condition_variable>
 #include <mutex>
-#include "ros/ros.h"
 
 class RingEstimation{
   std::deque<CircleScanResult*> m_CircleResults;
@@ -19,8 +18,6 @@ class RingEstimation{
   void Recieve(CircleScanResult* result);
   //Called from thread 2
   void Recieve(QRScanResult* result);
-
-  RingEstimation(ros::NodeHandle n);
 
   void Run();
   void inline ProcessImage(CircleScanResult* circles, QRScanResult* QR);
