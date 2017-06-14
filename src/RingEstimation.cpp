@@ -1,6 +1,7 @@
 #include "ring_detector/RingEstimation.h"
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include <ring_detector/RingData.h>
 
 RingEstimation::RingEstimation(ros::NodeHandle n){
 	publisher = n.advertise<std_msgs::String>("circleData", 1000);
@@ -22,7 +23,7 @@ void RingEstimation::Recieve(QRScanResult* result){
 	}
 	m_cond.notify_one();
 }
-
+o
 void RingEstimation::Run(){
   m_Running = true;
   while(m_Running){
