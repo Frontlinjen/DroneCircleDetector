@@ -7,7 +7,13 @@ struct Vec2{
 	int y;
 };
 
-
+struct Ellipse{
+	float centerX;
+	float centerY;
+	float a;
+	float b;
+	float rotation;
+};
 
 struct Line{
 	Vec2 start;

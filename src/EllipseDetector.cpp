@@ -1,7 +1,46 @@
 #include "ring_detector/EllipseDetector.h"
 #include <cmath>
 #include "ring_detector/ThomasAlgorithm.h"
+#include <opencv2/imgproc.hpp>
 #define TO_DEG(x) (x*(180/M_PI))
+
+bool TestLineBeam(Arc& first, Arc& third, Ellipse& el){
+	const int maxDist = 10;
+	Vec2 mi;
+	mi.x = 0,5 * (third.lines->back().mid.x - first.lines->at(0).mid.x);
+	mi.y = 0,5 * (third.lines->back().mid.y - first.lines->at(0).mid.y);
+
+	Line firstLine, lastLine;
+
+	firstLine = first.lines->at(0);
+	lastLine = third.lines->back();
+
+	float slopeFirst = tan(firstLine.angle);
+	float bFirst = firstLine.end.y - slopeFirst * firstLine.end.x;
+
+	float slopeLast = tan(lastLine.angle);
+	float bLast = lastLine.end.y - slopeLast * lastLine.end.x;
+
+	Vec2 ti;
+	ti.x = (bLast - bFirst) / (slopeFirst - slopeLast);
+	ti.y = slopeFirst * ti.x + bFirst;
+
+	float sloapBeam = (ti.y - mi.y) / (ti.x - mi.x);
+	float bBeam = ti.y - sloapBeam * ti.x;
+
+	float temp1, temp2;
+	temp1 = abs(sloapBeam * el.centerX + bBeam - el.centerY);
+	temp2 = sqrt(pow(sloapBeam, 2) + 1);
+
+	float dist = temp1 / temp2;
+	if(dist <= maxDist){
+		return true;
+	}
+	else{
+		return false;
+	}
+
+}
 
 bool TestInnerAngles(Arc& first, Arc& second, Arc& third){
 
@@ -24,7 +63,6 @@ bool TestInnerAngles(Arc& first, Arc& second, Arc& third){
 					vecIJ.y = itr2->start.y - itr->start.y;
 					normalVec2.x = -itr2->start.y;
 					normalVec2.y = itr2->start.x;
-
 					float dotp1, dotp2;
 					dotp1 = normalVec.x * vecIJ.x + normalVec.y * vecIJ.y;
 					dotp2 = normalVec2.x * vecIJ.x + normalVec2.y * vecIJ.y;
@@ -36,7 +74,27 @@ bool TestInnerAngles(Arc& first, Arc& second, Arc& third){
 			}
 		}
 	}
+	return true;
+}
 
+bool TestTangentError(const Arc& first, const Arc& second, const Arc& third, Ellipse el){
+	const int maxAngle = 10;
+	const std::vector<Line>* lines[3];
+	lines[0] = first.lines;
+	lines[1] = second.lines;
+	lines[2] = third.lines;
+
+	//Collect all points
+	for(size_t i = 0; i < 3 ; ++i){
+		for(std::vector<Line>::const_iterator itr1 = lines[i]->begin(); itr1 != lines[i]->end(); ++itr1){
+			float estAngle = atan2((-pow(el.b,2) * itr1->mid.x), (pow(el.a, 2) * itr1->mid.y)) * 180 / M_PI;
+			float vecAngle = itr1->angle;
+			if(vecAngle - estAngle >= maxAngle){
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 void EllipseDetector::generateLines(const LineContainer& lines, std::vector<Line>(& lineSegments)[4], kdTree::PointContainer(& startPoints)[4]){
@@ -206,3 +264,5 @@ std::vector<Arc> EllipseDetector::detect(const LineContainer lines){
 
 
 }
+
+
