@@ -1,7 +1,7 @@
 #include <vector>
 #include "ring_detector/RingBucket.h"
 
-void RingBucket::Insert(RingData* data){
+void RingBucket::Insert(RingDataInternal* data){
 	RingBucketContainer * bucket = Get(data->abs_x, data->abs_y);
 	bucket-> push_back(data);
 
@@ -13,7 +13,7 @@ RingBucketContainer * RingBucket::Get(float x, float y){
 	return m_buckets[bucket_x, bucket_y];
 }
 
-void RingBucket::Remove(RingData* data){
+void RingBucket::Remove(RingDataInternal* data){
 	RingBucketContainer * bucket = Get(data->abs_x, data->abs_y);
 	for(RingBucketContainer::iterator itr = bucket->begin(); itr != bucket->end(); ++itr){
 		if(*itr == data)

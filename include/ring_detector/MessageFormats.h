@@ -24,8 +24,8 @@ struct ScanResult{
 
 typedef ScanResult<CircleData> CircleScanResult;
 typedef ScanResult<QRData> QRScanResult;
- 
-struct RingData{
+
+struct RingDataInternal{
   char ring_number; //The ring number, if known. Calculated from QR
   float delta_x, delta_y, delta_z; //The rings position relative to the camera
   float abs_x, abs_y, abs_z; //The rings position in world coordinates.

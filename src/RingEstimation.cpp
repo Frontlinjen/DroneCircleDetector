@@ -4,7 +4,7 @@
 #include <ring_detector/RingData.h>
 
 RingEstimation::RingEstimation(ros::NodeHandle n){
-	publisher = n.advertise<std_msgs::String>("circleData", 1000);
+	publisher = n.advertise<ring_detector::RingData>("circleData", 1000);
 }
 
 
@@ -23,7 +23,7 @@ void RingEstimation::Recieve(QRScanResult* result){
 	}
 	m_cond.notify_one();
 }
-o
+
 void RingEstimation::Run(){
   m_Running = true;
   while(m_Running){
@@ -58,18 +58,18 @@ ProcessImage(circle, QR);
 void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
 	CircleData *Circledata = new CircleData();
 	//QRData *QRdata = new QRData();
-	RingData *ringData = new RingData();
+	RingDataInternal *ringData = new RingDataInternal();
 	//time_t timev;
 	/*for(std::vector<QRData>::iterator itr = QR->objects.begin(); itr != QR->objects.end(); ++itr){
 		ringData->delta_x = QRdata->x;
 		ringData->delta_y = QRdata->y;
 	}*/
-
+	ring_detector::RingData data;
 	for(std::vector<CircleData>::iterator itr = circles->objects.begin(); itr != circles->objects.end(); ++itr){
 		//RingData *ringData = new RingData();
-		ringData->abs_x = 0;
-		ringData->abs_z = 0;
-		ringData->abs_y = Circledata->distance;
+		data.abs_x = 0;
+		data.abs_y = Circledata->distance;
+		data.abs_z = 0;
 		//ringData->abs_x = drone->x - ringData->delta_x;
 		//ringData->abs_y = drone->y - ringData->delta_y;
 		/*float i_x = ringData->abs_x - QRdata->x;
@@ -86,6 +86,7 @@ void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
 		if(m_Bucket.Get(ringData->abs_x, ringData->abs_y)->empty()){
 			m_Bucket.Insert(ringData);
 		}
+		publisher.publish(data);
 	}
 
 	delete circles;
