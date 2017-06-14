@@ -21,8 +21,6 @@ class SharedResource{
     resource = init;
     id = 0;
   }
-  SharedResource(){
-  }
   Resource<T> Get(){
     std::shared_lock<std::shared_timed_mutex>  lock(m_Mutex);
     m_Condition.wait(lock);

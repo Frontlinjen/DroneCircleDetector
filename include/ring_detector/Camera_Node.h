@@ -22,7 +22,7 @@ class Camera_Node{
   void Start();
   void ImageCallback(const sensor_msgs::ImageConstPtr & img);
   void RegisterCallback(ProcessImageCallback c);
-  Camera_Node() : it(nodeHandle)
+  Camera_Node() : it(nodeHandle), currentImage(NULL)
      {
         sub = it.subscribe<Camera_Node>("ardrone/front/image_raw", 60, &Camera_Node::ImageCallback, this);
   };

@@ -25,12 +25,14 @@ void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> res
 		cv::namedWindow("Drone feed", CV_WINDOW_NORMAL);
 		cv::namedWindow("Input feed", CV_WINDOW_NORMAL);
 
-      
 		cv::createTrackbar("minDist", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &minDist);
-		
+		*m_default = 100;
 		cv::createTrackbar("param1", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &param1);
+		*m_default = 100;
 		cv::createTrackbar("param2", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &param2);
+		*m_default = 0;
 		cv::createTrackbar("minRadius", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &minRadius);
+		*m_default = 0;
 		cv::createTrackbar("maxRadius", "Input feed", m_default, 300, TrackbarCallback<int, 1, 300>, &maxRadius);
 		*m_default = 50;
 		cv::createTrackbar("minSaturation", "Input feed", m_default, 300, TrackbarCallback<int, 100, 300>, &minSaturation);
@@ -90,7 +92,7 @@ void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> res
         //cvtColor(resource->image, droneFeed, CV_BGR2GRAY); 
 	droneFeed = resource.resource->image;
 	CircleScanResult * circleResult = new CircleScanResult;
-
+	circleResult->frameID =resource.id;
 	for(std::vector<cv::Vec3f>::iterator itr = circles.begin(); itr != circles.end(); ++itr )
 	{
 		circleResult->objects.emplace_back();

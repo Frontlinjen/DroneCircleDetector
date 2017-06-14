@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-typedef unsigned int FrameID;
+typedef unsigned long FrameID;
 
 struct CircleData{
   unsigned int x, y;

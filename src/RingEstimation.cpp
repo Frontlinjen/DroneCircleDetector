@@ -5,6 +5,7 @@
 
 RingEstimation::RingEstimation(ros::NodeHandle n){
 	publisher = n.advertise<ring_detector::RingData>("circleData", 1000);
+	ros::Rate loop_rate(10);
 }
 
 
@@ -56,6 +57,9 @@ ProcessImage(circle, QR);
 }
 
 void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
+	if(circles == NULL){
+		return;
+	}
 	CircleData *Circledata = new CircleData();
 	//QRData *QRdata = new QRData();
 	RingDataInternal *ringData = new RingDataInternal();
@@ -68,8 +72,9 @@ void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
 	for(std::vector<CircleData>::iterator itr = circles->objects.begin(); itr != circles->objects.end(); ++itr){
 		//RingData *ringData = new RingData();
 		data.abs_x = 0;
-		data.abs_y = Circledata->distance;
+		data.abs_y = itr->distance/1000;
 		data.abs_z = 0;
+		std::cout << "y-cirkel distance: " << data.abs_y << std::endl;
 		//ringData->abs_x = drone->x - ringData->delta_x;
 		//ringData->abs_y = drone->y - ringData->delta_y;
 		/*float i_x = ringData->abs_x - QRdata->x;

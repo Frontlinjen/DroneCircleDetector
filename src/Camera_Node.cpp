@@ -9,6 +9,7 @@
 #include <iostream>
 #include <opencv2/core/ocl.hpp>
 #include <cmath>
+#include <thread>
 //Not thread safe
 void Camera_Node::RegisterCallback(ProcessImageCallback c){
   m_Jobs.emplace_back(currentImage, c);
@@ -47,9 +48,11 @@ int main(int argc, char ** argv){
   Camera_Node cNode;
   Ring_Detector detector(&estimator);
   QR_Detector qrdetector(&estimator);
+  std::thread t(&RingEstimation::Run, std::ref(estimator));
   cNode.RegisterCallback(static_cast<ImageProcessor*>(&detector));
   cNode.RegisterCallback(static_cast<ImageProcessor*>(&qrdetector));
   cNode.Start();
+  t.join();
 }
 
 
