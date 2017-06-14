@@ -1,14 +1,6 @@
 #include "ring_detector/kdtree.h"
 #include <algorithm>
 
-template<>
-void kdTree::searchNode<true>(kdNode* node, Rect& parent, Rect& rect, std::vector<kdLeaf>& locatedPoints);
-
-
-template<>
-void kdTree::searchNode<false>(kdNode* node, Rect& parent, Rect& rect, std::vector<kdLeaf>& locatedPoints);
-
-
 bool compareY(const kdLeaf& first, const kdLeaf& second){
   return first.p.y < second.p.y;
 }
@@ -58,8 +50,56 @@ std::vector<kdLeaf> kdTree::InRange(Rect& rect){
   return points;
 }
 
+template<bool X>
+inline Rect CalculateLeftBoundingBox(Rect& rect, uint32_t slice);
+
+
+template<bool X>
+inline Rect CalculateRightBoundingBox(Rect& rect, uint32_t slice);
+
 template<>
-void kdTree::searchNode<true>(kdNode* node,Rect& parent, Rect& rect, std::vector<kdLeaf>& locatedPoints){
+inline Rect CalculateLeftBoundingBox<true>(Rect& rect, uint32_t slice){
+	Rect childRegion = rect;
+	const uint32_t startPos = rect.center.x - rect.width;
+	const uint32_t endpos = slice;
+	childRegion.width = std::ceil((endpos - startPos)*0.5f);
+	childRegion.center.x = startPos + childRegion.width;
+	return childRegion;
+}
+
+template<>
+inline Rect CalculateRightBoundingBox<true>(Rect& rect, uint32_t slice){
+	Rect childRegion = rect;
+	const uint32_t startPos = slice;
+	const uint32_t endpos = rect.center.x + rect.width;
+	childRegion.width = std::ceil((endpos - startPos)*0.5f);
+	childRegion.center.x = startPos + childRegion.width;
+	return childRegion;
+}
+
+template<>
+inline Rect CalculateLeftBoundingBox<false>(Rect& rect, uint32_t slice){
+	Rect childRegion = rect;
+	const uint32_t startPos = rect.center.y - rect.height;
+	const uint32_t endpos = slice;
+	childRegion.height = std::ceil((endpos - startPos)*0.5f);
+	childRegion.center.y = startPos + childRegion.height;
+	return childRegion;
+}
+
+
+template<>
+inline Rect CalculateRightBoundingBox<false>(Rect& rect, uint32_t slice){
+	Rect childRegion = rect;
+	const uint32_t startPos = slice;
+	const uint32_t endpos = rect.center.y + rect.height;
+	childRegion.height = std::ceil((endpos - startPos)*0.5f);
+	childRegion.center.y = startPos + childRegion.height;
+	return childRegion;
+}
+
+template<bool splitX>
+void kdTree::searchNode(kdNode* node,Rect& parent, Rect& rect, std::vector<kdLeaf>& locatedPoints){
   if(node->type == kdNode::LEAF){
     if(rect.contains(node->leaf.p)){
       locatedPoints.push_back(node->leaf);//add it to the list
@@ -69,18 +109,13 @@ void kdTree::searchNode<true>(kdNode* node,Rect& parent, Rect& rect, std::vector
     const uint32_t newOffset = node->branch.location;
     if(node->branch.left != NULL){
       if(node->branch.left->type == kdNode::BRANCH){
-		Rect childRegion = parent;
-		const uint32_t startPos = parent.center.x - parent.width;
-		const uint32_t endpos = newOffset;
-		childRegion.width = std::ceil((endpos - startPos)*0.5f);
-		childRegion.center.x = startPos + childRegion.width;
-
+		Rect childRegion = CalculateLeftBoundingBox<splitX>(parent, newOffset);
 		const int result = childRegion.intersects(rect);
 		if(result == 1){
 		  collectPoints(node->branch.left, locatedPoints);
 		}
 		else if(result == 0){
-		  searchNode<false>(node->branch.left, childRegion, rect, locatedPoints);
+		  searchNode<!splitX>(node->branch.left, childRegion, rect, locatedPoints);
 		}
       }
       else{
@@ -91,84 +126,19 @@ void kdTree::searchNode<true>(kdNode* node,Rect& parent, Rect& rect, std::vector
     }
     if(node->branch.right != NULL){
       if(node->branch.right->type == kdNode::BRANCH){
-		Rect childRegion = parent;
-		const uint32_t startPos = newOffset;
-		const uint32_t endpos = parent.center.x + parent.width;
-		childRegion.width = std::ceil((endpos - startPos)*0.5f);
-		childRegion.center.x = startPos + childRegion.width;
-
+    	Rect childRegion = CalculateRightBoundingBox<splitX>(parent, newOffset);
 		const int result = childRegion.intersects(rect);
 		if(result == 1){
 		  collectPoints(node->branch.right, locatedPoints);
 		}
 		else if(result == 0){
-		  searchNode<false>(node->branch.right, childRegion, rect, locatedPoints);
+		  searchNode<!splitX>(node->branch.right, childRegion, rect, locatedPoints);
 		}
       }
       else{
     	  if(rect.contains(node->branch.right->leaf.p)){
     	     locatedPoints.push_back(node->leaf);//add it to the list
     	  }
-      }
-    }
-  }
-}
-
-template<>
-void kdTree::searchNode<false>(kdNode* node,Rect& parent, Rect& rect, std::vector<kdLeaf>& locatedPoints){
-  if(node->type == kdNode::LEAF){
-    if(rect.contains(node->leaf.p)){
-      locatedPoints.push_back(node->leaf);
-    }
-  }
-  else{
-    const uint32_t newOffset = node->branch.location;
-    if(node->branch.left != NULL){
-      
-      //searchNode<true>(node->branch.left
-	if(node->branch.left->type==kdNode::BRANCH){
-		Rect childRegion = parent;
-		const uint32_t startPos = parent.center.y - parent.height;
-		const uint32_t endpos = newOffset;
-		childRegion.height = std::ceil((endpos - startPos)*0.5f);
-		childRegion.center.y = startPos + childRegion.height;
-
-		const int result = childRegion.intersects(rect);
-		if(result == 1){
-		  collectPoints(node->branch.left, locatedPoints);
-		}
-		else if(result == 0){
-		  searchNode<true>(node->branch.left, childRegion, rect, locatedPoints);
-		}
-      }
-      else
-      {	
-    	  if(rect.contains(node->branch.left->leaf.p)){
-    	      locatedPoints.push_back(node->branch.left->leaf);//add it to the list
-    	  }
-      }
-      
-    }
-    if(node->branch.right != NULL){
-      if(node->branch.right->type==kdNode::BRANCH){
-		Rect childRegion = parent;
-		const uint32_t startPos = newOffset;
-		const uint32_t endpos = parent.center.y + parent.height;
-		childRegion.height = std::ceil((endpos - startPos)*0.5f);
-		childRegion.center.y = startPos + childRegion.height;
-
-		const int result = childRegion.intersects(rect);
-		if(result == 1){
-		  collectPoints(node->branch.right, locatedPoints);
-		}
-		else if(result == 0){
-			searchNode<true>(node->branch.right, childRegion, rect, locatedPoints);
-			}
-		}
-		else{
-		  if(rect.contains(node->branch.right->leaf.p)){
-		      locatedPoints.push_back(node->branch.right->leaf);//add it to the list
-		  }
       }
     }
   }
