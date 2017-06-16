@@ -3,9 +3,13 @@
 #include "std_msgs/String.h"
 #include <ring_detector/RingData.h>
 
-RingEstimation::RingEstimation(ros::NodeHandle n){
+RingEstimation::RingEstimationPublisher(ros::NodeHandle n){
 	publisher = n.advertise<ring_detector::RingData>("circleData", 1000);
 	ros::Rate loop_rate(10);
+}
+
+RingEstimation::RingEstimationLitener(ros::NodeHandle n){
+	subscriber = n.advertise<ring_detector::RingData>("circleData", 1000);
 }
 
 
@@ -69,6 +73,14 @@ void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
 	ring_detector::RingData data;
 	if(circles == NULL){
 		for(std::vector<QRData>::iterator itr = QR->objects.begin(); itr != QR->objects.end(); ++itr){
+			data.delta_x = 0;
+			data.delta_y = itr->distance;
+			data.delta_z = 0.60; //Skal reestimeres
+
+			/*if(RingData(ringData->abs_x, ringData->abs_y) != null){
+					ringData->viewcount = ringData->viewcount + 1;
+				}
+				*/
 
 		}
 	}
