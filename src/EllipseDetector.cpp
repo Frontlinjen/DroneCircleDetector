@@ -33,13 +33,8 @@ bool TestLineBeam(Arc& first, Arc& third, Ellipse& el){
 	temp2 = sqrt(pow(sloapBeam, 2) + 1);
 
 	float dist = temp1 / temp2;
-	if(dist <= maxDist){
-		return true;
-	}
-	else{
-		return false;
-	}
 
+	return dist <= maxDist;
 }
 
 bool TestInnerAngles(Arc& first, Arc& second, Arc& third){
@@ -77,7 +72,7 @@ bool TestInnerAngles(Arc& first, Arc& second, Arc& third){
 	return true;
 }
 
-bool TestTangentError(const Arc& first, const Arc& second, const Arc& third, Ellipse el){
+bool TestTangentError(const Arc& first, const Arc& second, const Arc& third, Ellipse& el){
 	const int maxAngle = 10;
 	const std::vector<Line>* lines[3];
 	lines[0] = first.lines;
@@ -95,6 +90,30 @@ bool TestTangentError(const Arc& first, const Arc& second, const Arc& third, Ell
 		}
 	}
 	return true;
+}
+
+Ellipse fitEllipse(const Arc& first, const Arc& second, const Arc& third){
+	std::vector<cv::Point> points;
+	const Arc* arcs[3];
+	arcs[0] = &first;
+	arcs[1] = &second;
+	arcs[2] = &third;
+	for(uint8_t i = 0; i < 3; ++i){
+		for(std::vector<Line>::const_iterator itr = arcs[i]->lines->begin();itr != arcs[i]->lines->end(); ++itr){
+			points.emplace_back(itr->start.x, itr->start.y);
+			points.emplace_back(itr->mid.x, itr->mid.y);
+			points.emplace_back(itr->end.x, itr->end.y);
+		}
+	}
+	cv::RotatedRect rBox = cv::fitEllipse(points);
+	Ellipse ell;
+	ell.centerX = rBox.center.x;
+	ell.centerY = rBox.center.y;
+	ell.a = rBox.size.width / 2;
+	ell.b = rBox.size.height / 2;
+	ell.rotation = rBox.angle;
+
+	return ell;
 }
 
 void EllipseDetector::generateLines(const LineContainer& lines, std::vector<Line>(& lineSegments)[4], kdTree::PointContainer(& startPoints)[4]){
@@ -149,11 +168,11 @@ void EllipseDetector::generateLines(const LineContainer& lines, std::vector<Line
 		++itr;
 }}
 
-std::vector<Arc> EllipseDetector::extractArcs(std::vector<Line> (& lineSegments)[4], kdTree::PointContainer (& startPoints)[4]){
+std::vector<Arc>* EllipseDetector::extractArcs(std::vector<Line> (& lineSegments)[4], kdTree::PointContainer (& startPoints)[4]){
 		kdTree tree;
 		const float errLine = 45.0f;
 		const int maxDistance = 20;
-		std::vector<Arc> arcs;
+		std::vector<Arc>* arcs = new std::vector<Arc>[4];
 		for(int i = 0; i < 4; i++){
 			tree.buildTree(startPoints[i]);
 			for(Line* startLine = &(lineSegments[i].front()); startLine != &(lineSegments[i].back()) + 1; ++startLine){
@@ -218,12 +237,59 @@ std::vector<Arc> EllipseDetector::extractArcs(std::vector<Line> (& lineSegments)
 						a.centerX = r.centerX;
 						a.centerY = r.centerY;
 						a.radius = r.radius;
-						arcs.push_back(a);
+						arcs[i].push_back(a);
 					}
 				}
 			}
 		}
 		return arcs;
+}
+
+std::vector<ExtendedArc> EllipseDetector::extractExtendedArcs(std::vector<Arc>* arcs){
+	const float tolerance = 0.0f;
+	const float mGap = 0.0f;
+	std::vector<ExtendedArc> extArcs;
+	for(uint8_t i=0;i < 4;++i){
+		std::vector<Arc>* preArcs = &arcs[(i - 1 + 4)%4];
+		std::vector<Arc>* currentArcs = &arcs[i];
+		std::vector<Arc>* postArcs = &arcs[(i + 1 + 4)%4];
+		for(std::vector<Arc>::iterator current = currentArcs->begin(); current != currentArcs->end(); ++current){
+			while(true){
+				std::vector<Arc>::iterator previous = preArcs->begin();
+				std::vector<Arc>::iterator next = postArcs->begin();
+
+				//TODO: Investigate if this is correct way of checking it
+				if(previous->absoluteDistance(*current) < tolerance && next->absoluteDistance(*current) < tolerance){
+					if(previous->relativeDistance(*current) < tolerance && next->relativeDistance(*current) < tolerance){
+						float AB[2];
+						float BC[2];
+						previous->gapAngle(*current, AB);
+						next->gapAngle(*current, BC);
+							if(AB[0] < mGap && AB[1] < mGap && BC[0] < mGap && BC[1] < mGap ){
+								if(TestInnerAngles(*previous, *current, *next)){
+									//Estimating ellipse..
+									Ellipse ellipse = fitEllipse(*previous, *current, *next);
+									if(TestTangentError(*previous, *current, *next, ellipse)){
+										if(TestLineBeam(*previous, *next, ellipse)){
+											ExtendedArc newArc;
+											newArc.a = ellipse.a;
+											newArc.b = ellipse.b;
+											newArc.alpha = ellipse.rotation;
+											newArc.position = { ellipse.centerX, ellipse.centerY };
+											newArc.arcs[0] = &(*previous);
+											newArc.arcs[1] = &(*current);
+											newArc.arcs[2] = &(*next);
+											extArcs.push_back(newArc);
+										}
+									}
+								}
+							}
+					}
+				}
+			}
+		}
+	}
+	return extArcs;
 }
 
 std::vector<Arc> EllipseDetector::detect(const LineContainer lines){
@@ -234,9 +300,11 @@ std::vector<Arc> EllipseDetector::detect(const LineContainer lines){
 	kdTree::PointContainer startPoints[4];
 	generateLines(lines, lineSegments, startPoints);
 
-	std::vector<Arc> arcs = extractArcs(lineSegments, startPoints);
+	std::vector<Arc>* arcs = extractArcs(lineSegments, startPoints);
+
+
 	//Compute extended arcs:
-	for(std::vector<Arc>::iterator startArc = arcs.begin(); startArc != arcs.end(); ++startArc){
+	for(std::vector<Arc>::iterator startArc = arcs->begin(); startArc != arcs->end(); ++startArc){
 		//TODO absolute distance
 		//Gx < Darc
 		//Gy < Darc
