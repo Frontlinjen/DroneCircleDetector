@@ -45,19 +45,6 @@ void QR_Detector::ProcessImage(const Resource<cv_bridge::CvImageConstPtr> resour
 			cv::line(img, pts[i], pts[(i+1)%4],cv::Scalar(255,0,0),3);
 		}
 		int pixels = r.size.width;
-		std::cout << "Radius: " << r.size.width/2 << std::endl;
-		cv::Vec2f vector1(r.center.x, r.center.y);
-		cv::Vec2f vector2((r.size.width/2), 0);
-		cv::Vec2f vector3(vector1[0] - vector2[0], vector1[1] - vector2[1]);
-		float i = Scalarproduct(vector1, vector3)/Pythagoras(vector1, vector3);
-		std::cout << "vector 1: " << vector1[0]<< " , " << vector1[1] << std::endl;
-		std::cout << "vector 2: " << vector2[0]<< " , " << vector2[1] << std::endl;
-		std::cout << "vector 3: " << vector3[0]<< " , " << vector3[1] << std::endl;
-		std::cout << "Scalar: " << Scalarproduct(vector1, vector3) << std::endl;
-		std::cout << "Pytha: " << Pythagoras(vector1, vector3) << std::endl;
-
-		float angle = (acos(i) * (180/PI));
-		std::cout << "Angle: " << angle << std::endl;
 		if(itr->get_data().at(0) == 'p' || itr->get_data().at(0) == 'P')
 		{
 			data->ring_number = std::atoi(&itr->get_data().at(3));
