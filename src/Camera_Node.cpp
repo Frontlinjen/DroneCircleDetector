@@ -15,6 +15,9 @@ void Camera_Node::RegisterCallback(ProcessImageCallback c){
   m_Jobs.emplace_back(currentImage, c);
   m_Workers.emplace_back(&ProcessingThread::Run, m_Jobs.back());
 }
+void chatterCallback(const std_msgs::String::ConstPtr& msg){
+	ROS_INFO("I heard: [%s]", msg->data.c_str());
+}
 
 
 //Thread safe
