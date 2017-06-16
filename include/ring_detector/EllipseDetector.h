@@ -54,7 +54,7 @@ struct Arc{
 		return (pow(AB.x, 2) + pow(AB.y, 2))/(pow(A.x, 2) + pow(A.y, 2));
 	}
 
-	void gapAngle(Arc& other, float* container){
+	void gapAngle(Arc& other, float (&container)[2]){
 		Line& last = lines->back();
 		Line& first = other.lines->front();
 		Vec2 G;
@@ -100,5 +100,6 @@ class EllipseDetector{
   static std::vector<Arc> detect(const LineContainer  lines);
  protected:
   static void generateLines(const LineContainer& lines, std::vector<Line> (& lineSegments)[4], kdTree::PointContainer (& startPoints)[4]);
-  static std::vector<Arc> extractArcs(std::vector<Line> (& lineSegments)[4], kdTree::PointContainer (& startPoints)[4]);
+  static std::vector<Arc>* extractArcs(std::vector<Line> (& lineSegments)[4], kdTree::PointContainer (& startPoints)[4]);
+  static std::vector<ExtendedArc> extractExtendedArcs(std::vector<Arc>* arcs);
 };
