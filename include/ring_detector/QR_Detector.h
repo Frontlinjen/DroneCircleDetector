@@ -27,7 +27,7 @@ constexpr float constantRing = 561.2244897959;
 
 class QR_Detector : public ImageProcessor{
 	zbar::ImageScanner scanner;
-	float deltaDistance = 0;
+	float distance = 0;
 	RingEstimation* m_callOnFinish;
 public:
 	QR_Detector(RingEstimation* callback){

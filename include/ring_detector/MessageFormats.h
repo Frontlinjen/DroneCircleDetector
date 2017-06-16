@@ -31,6 +31,7 @@ struct RingDataInternal{
   float abs_x, abs_y, abs_z; //The rings position in world coordinates.
   float norm_x, norm_y; //The direction of the ring
   float distance;
+  float accuracy; //Percentage chance of a ring is at the given coordinates
   unsigned long timestamp;
   unsigned long viewcount;
 };
