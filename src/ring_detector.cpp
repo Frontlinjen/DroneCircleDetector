@@ -103,15 +103,31 @@ void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> res
 		// draw the circle outline
 		cv::circle(droneFeed, center, radius, cv::Scalar(255,0,255), 3, 8, 0);
 		int pixels = radius*2;
-		distance = (width * constant) / pixels;
-		std::cout << "Ring-Distance: " << distance << std::endl;
+		distance = ((width * constant) / pixels) / 1000;
+		float pixelLength = distance * 0.22;
+		float abs_centerX = center.x;
+		float abs_distance = distance;
+		if(center.x > 320){
+			abs_centerX = ((center.x - 320) * pixelLength) / 100;
+
+		}
+		if(center.x < 320){
+			abs_centerX = ((320 - center.x) * pixelLength) / 100;
+		}
+		abs_distance = sqrt((pow(distance, 2) + pow(abs_centerX, 2)));
 		if(distance <4000){
 			CircleData * data = &circleResult->objects.back();
 			data->radius = radius;
 			data->angle = 0;
 			data->x = center.x;
 			data->y = center.y;
-			data->distance = distance;
+			data->distance = abs_distance;
+
+			printf("%s %.2f \n","X center", center.x);
+			printf("%s%.2f \n","Ring-distance ", distance);
+			printf("%s%.2f \n","b-length ", abs_centerX);
+			printf("%s%.2f \n","abs_Ring-Distance ", abs_distance);
+
 		}
 	}
 

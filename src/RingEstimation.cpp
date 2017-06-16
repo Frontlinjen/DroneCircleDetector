@@ -57,9 +57,7 @@ ProcessImage(circle, QR);
 }
 
 void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
-	if(circles == NULL){
-		return;
-	}
+
 	CircleData *Circledata = new CircleData();
 	//QRData *QRdata = new QRData();
 	RingDataInternal *ringData = new RingDataInternal();
@@ -69,31 +67,38 @@ void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
 		ringData->delta_y = QRdata->y;
 	}*/
 	ring_detector::RingData data;
-	for(std::vector<CircleData>::iterator itr = circles->objects.begin(); itr != circles->objects.end(); ++itr){
-		//RingData *ringData = new RingData();
-		data.abs_x = 0;
-		data.abs_y = itr->distance/1000;
-		data.abs_z = 0;
-		std::cout << "y-cirkel distance: " << data.abs_y << std::endl;
-		//ringData->abs_x = drone->x - ringData->delta_x;
-		//ringData->abs_y = drone->y - ringData->delta_y;
-		/*float i_x = ringData->abs_x - QRdata->x;
-		float i_y = ringData->abs_y - QRdata->y;
-		if(i_x <=1 && i_x >= -1 && i_y <=1 && i_y >= -1){
-			ringData->ring_number = QRdata->ring_number;
-			ringData->distance = QRdata->distance;
-		}*/
-		//ringData->timestamp = std::time(&timev);
-		/*if(RingData(ringData->abs_x, ringData->abs_y) != null){
-			ringData->viewcount = ringData->viewcount + 1;
-		}else
-			ringData->viewcount = 1;*/
-		if(m_Bucket.Get(ringData->abs_x, ringData->abs_y)->empty()){
-			m_Bucket.Insert(ringData);
-		}
-		publisher.publish(data);
-	}
+	if(circles == NULL){
+		for(std::vector<QRData>::iterator itr = QR->objects.begin(); itr != QR->objects.end(); ++itr){
 
+		}
+	}
+	else
+	{
+		for(std::vector<CircleData>::iterator itr = circles->objects.begin(); itr != circles->objects.end(); ++itr){
+				//RingData *ringData = new RingData();
+				data.delta_x = 0; //bredde
+				data.delta_y = itr->distance; //Fremad
+				data.delta_z = 0; //Højde
+
+				//ringData->abs_x = drone->x - ringData->delta_x;
+				//ringData->abs_y = drone->y - ringData->delta_y;
+				/*float i_x = ringData->abs_x - QRdata->x;
+				float i_y = ringData->abs_y - QRdata->y;
+				if(i_x <=1 && i_x >= -1 && i_y <=1 && i_y >= -1){
+					ringData->ring_number = QRdata->ring_number;
+					ringData->distance = QRdata->distance;
+				}*/
+				//ringData->timestamp = std::time(&timev);
+				/*if(RingData(ringData->abs_x, ringData->abs_y) != null){
+					ringData->viewcount = ringData->viewcount + 1;
+				}else
+					ringData->viewcount = 1;*/
+				if(m_Bucket.Get(ringData->abs_x, ringData->abs_y)->empty()){
+					m_Bucket.Insert(ringData);
+				}
+				publisher.publish(data);
+			}
+	}
 	delete circles;
 	delete QR;
 }
