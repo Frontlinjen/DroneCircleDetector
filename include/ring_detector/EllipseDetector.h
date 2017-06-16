@@ -98,7 +98,6 @@ class EllipseDetector{
 
  public:
   static std::vector<Arc> detect(const LineContainer  lines);
- protected:
   static void generateLines(const LineContainer& lines, std::vector<Line> (& lineSegments)[4], kdTree::PointContainer (& startPoints)[4]);
   static std::vector<Arc> extractArcs(std::vector<Line> (& lineSegments)[4], kdTree::PointContainer (& startPoints)[4]);
 };

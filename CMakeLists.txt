@@ -201,8 +201,10 @@ target_link_libraries(ring_detector zbar)
 
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(utest tests/kdtree.cpp src/kdtree.cpp)
+catkin_add_gtest(EllipseTest tests/EllipseDetectTest.cpp src/ring_detector.cpp src/Camera_Node.cpp src/QR_Detector.cpp src/Drone_Recorder.cpp src/RingBucket.cpp src/RingEstimation.cpp src/kdtree.cpp src/EllipseDetector.cpp src/ThomasAlgorithm.cpp)
 #f(TARGET ${PROJECT_NAME}-test)
 #target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
+target_link_libraries(EllipseTest ${catkin_LIBRARIES})
 # endif()
 
 ## Add folders to be run by python nosetests
