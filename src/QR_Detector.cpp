@@ -21,7 +21,7 @@
 void QR_Detector::ProcessImage(const Resource<cv_bridge::CvImageConstPtr> resource)
 {
 	if(resource.resource.get() == NULL)
-			return;
+		return;
 	cv::Mat img;
 	cv::cvtColor(resource.resource->image,img,CV_BGR2GRAY);
 	img = img > 128;
@@ -45,34 +45,47 @@ void QR_Detector::ProcessImage(const Resource<cv_bridge::CvImageConstPtr> resour
 			cv::line(img, pts[i], pts[(i+1)%4],cv::Scalar(255,0,0),3);
 		}
 		int pixels = r.size.width;
+
 		if(itr->get_data().at(0) == 'p' || itr->get_data().at(0) == 'P')
 		{
 			data->ring_number = std::atoi(&itr->get_data().at(3));
 			std::cout << "Ring number: " << data->ring_number << std::endl;
-			deltaDistance = (widthRing * constantRing) / pixels;
+			distance = (widthRing * constantRing) / pixels;
 		}
 
 		if(itr->get_data().at(0) == 'w' || itr->get_data().at(0) == 'W'){
 			std::cout << "The QR code is a wall! Which belongs to the ";
-			deltaDistance = (widthWall * constantWall) / pixels;
+			distance = (widthWall * constantWall) / pixels;
 			switch(itr->get_data().at(2)){
-				case 0 : std::cout << "north wall" << std::endl;
-				break;
-				case 1 : std::cout << "east wall" << std::endl;
-				break;
-				case 2 : std::cout << "south wall" << std::endl;
-				break;
-				case 3 : std::cout << "west wall" << std::endl;;
-				break;
+			case 0 : std::cout << "north wall" << std::endl;
+			break;
+			case 1 : std::cout << "east wall" << std::endl;
+			break;
+			case 2 : std::cout << "south wall" << std::endl;
+			break;
+			case 3 : std::cout << "west wall" << std::endl;;
+			break;
 			}
 		}
-		std::cout << "QR-Distance: " << deltaDistance << std::endl;
+
+		float pixelLength = distance * 0.22;
+		float abs_centerX = r.center;
+		float abs_distance = distance;
+		if(r.center > 320){
+			abs_centerX = ((r.center - 320) * pixelLength) / 100;
+
+		}
+		if(r.center < 320){
+			abs_centerX = ((320 - r.center) * pixelLength) / 100;
+		}
+		abs_distance = sqrt((pow(distance, 2) + pow(abs_centerX, 2)));
+
+		std::cout << "QR-Distance: " << distance << std::endl;
 		data->angle = r.angle;
-		data->distance = deltaDistance;
+		data->distance = abs_distance;
 		data->x = r.center.x;
 		data->y = r.center.y;
-		std::cout << "x-coordinator: " << r.center.x << std::endl;
-		std::cout << "y-coordinator: " << r.center.y << std::endl;
+
 
 	}
 	imageToScan.set_data(NULL, 0);
