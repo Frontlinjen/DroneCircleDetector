@@ -72,15 +72,15 @@ bool TestInnerAngles(Arc& first, Arc& second, Arc& third){
 	return true;
 }
 
-bool TestTangentError(const Arc& first, const Arc& second, const Arc& third, Ellipse& el){
+bool TestTangentError(Arc** const first, const size_t arcs, Ellipse el){
 	const int maxAngle = 10;
-	const std::vector<Line>* lines[3];
-	lines[0] = first.lines;
-	lines[1] = second.lines;
-	lines[2] = third.lines;
+	const std::vector<Line>* lines[arcs];
+	for(size_t i = 0 ; i < arcs ; ++i){
+		lines[i] = (*first[i]).lines;
+	}
 
 	//Collect all points
-	for(size_t i = 0; i < 3 ; ++i){
+	for(size_t i = 0; i < arcs ; ++i){
 		for(std::vector<Line>::const_iterator itr1 = lines[i]->begin(); itr1 != lines[i]->end(); ++itr1){
 			float estAngle = atan2((-pow(el.b,2) * itr1->mid.x), (pow(el.a, 2) * itr1->mid.y)) * 180 / M_PI;
 			float vecAngle = itr1->angle;
@@ -92,14 +92,14 @@ bool TestTangentError(const Arc& first, const Arc& second, const Arc& third, Ell
 	return true;
 }
 
-Ellipse fitEllipse(const Arc& first, const Arc& second, const Arc& third){
+Ellipse fitEllipse(Arc** const first, const size_t arcs){
 	std::vector<cv::Point> points;
-	const Arc* arcs[3];
-	arcs[0] = &first;
-	arcs[1] = &second;
-	arcs[2] = &third;
+	const std::vector<Line>* lines[arcs];
+	for(size_t i = 0; i < arcs; ++i){
+		lines[i] = (*first[i]).lines;
+	}
 	for(uint8_t i = 0; i < 3; ++i){
-		for(std::vector<Line>::const_iterator itr = arcs[i]->lines->begin();itr != arcs[i]->lines->end(); ++itr){
+		for(std::vector<Line>::const_iterator itr = first[i]->lines->begin();itr != first[i]->lines->end(); ++itr){
 			points.emplace_back(itr->start.x, itr->start.y);
 			points.emplace_back(itr->mid.x, itr->mid.y);
 			points.emplace_back(itr->end.x, itr->end.y);
@@ -267,18 +267,22 @@ std::vector<ExtendedArc> EllipseDetector::extractExtendedArcs(std::vector<Arc>* 
 						next->gapAngle(*current, BC);
 							if(AB[0] < mGap && AB[1] < mGap && BC[0] < mGap && BC[1] < mGap ){
 								if(TestInnerAngles(*previous, *current, *next)){
+									Arc* currentArcs[3];
+									currentArcs[0] = &(*previous);
+									currentArcs[1] = &(*current);
+									currentArcs[2] = &(*next);
 									//Estimating ellipse..
-									Ellipse ellipse = fitEllipse(*previous, *current, *next);
-									if(TestTangentError(*previous, *current, *next, ellipse)){
+									Ellipse ellipse = fitEllipse(currentArcs, 3);
+									if(TestTangentError(currentArcs, 3, ellipse)){
 										if(TestLineBeam(*previous, *next, ellipse)){
 											ExtendedArc newArc;
 											newArc.a = ellipse.a;
 											newArc.b = ellipse.b;
 											newArc.alpha = ellipse.rotation;
 											newArc.position = { ellipse.centerX, ellipse.centerY };
-											newArc.arcs[0] = &(*previous);
-											newArc.arcs[1] = &(*current);
-											newArc.arcs[2] = &(*next);
+											newArc.arcs.push_back(&(*previous));
+											newArc.arcs.push_back(&(*current));
+											newArc.arcs.push_back(&(*next));
 											extArcs.push_back(newArc);
 										}
 									}
@@ -292,45 +296,106 @@ std::vector<ExtendedArc> EllipseDetector::extractExtendedArcs(std::vector<Arc>* 
 	return extArcs;
 }
 
-std::vector<Arc> EllipseDetector::detect(const LineContainer lines){
+bool EllipseDetector::canBeMerged(std::vector<Arc*> arcs){
+		const int max = 5;
+		Ellipse e = fitEllipse(arcs.data(), arcs.size());
+		if(!TestTangentError(arcs.data(), arcs.size(), e) || !TestLineBeam(*(arcs.front()), *(arcs.back()), e)){
+			return false;
+		}
+		else {
+			for(std::vector<Arc*>::iterator itr2 = arcs.begin(); itr2 != arcs.end() ; ++itr2){
+				for(std::vector<Line>::iterator line = (*itr2)->lines->begin(); line != (*itr2)->lines->end(); ++itr2){
+					float value, value2;
+					value = pow((line->start.x / e.a), 2) + pow((line->start.y / e.b), 2) - 1;
+					value2 = pow((line->end.x / e.a), 2) + pow((line->end.y / e.b), 2) - 1;
+					if(value > max || value2 > max){
+						return false;
+					}
+				}
+			}
+		}
+	return true;
+}
+
+std::vector<Ellipse> EllipseDetector::detect(const LineContainer lines){
 	if(lines.size() == 0)
-		return std::vector<Arc>();
+		return std::vector<Ellipse>();
 
 	std::vector<Line> lineSegments[4];
 	kdTree::PointContainer startPoints[4];
 	generateLines(lines, lineSegments, startPoints);
 
+
 	std::vector<Arc>* arcs = extractArcs(lineSegments, startPoints);
 
+	std::vector<ExtendedArc> extendedArcs = extractExtendedArcs(arcs);
 
-	//Compute extended arcs:
-	for(std::vector<Arc>::iterator startArc = arcs->begin(); startArc != arcs->end(); ++startArc){
-		//TODO absolute distance
-		//Gx < Darc
-		//Gy < Darc
-		//Darc bestemmer vi selv. Gx er x-værdien for vektoren mellem slutpunktet for sidste line i testarc og startpunktet for første line i candidateArc
+	std::vector<ExtendedArc> almostEllipse;
 
-
-		//TODO relative distance
-		//drel = |AB|/|A| > dmin
-		//AB er vektoren der forbinder arcsnes startpunkter. A og B peger fra start til end på hver arc.
-
-		//TODO Gap angles
-		//ThetaGap,a = Vinklen mellem(La og G)
-		//ThetaGap,b = Vinklen mellem(Lb og G
-		//La er sidste linje i arc a (testarc), og Lb er første linje i arc b (kandidat arc).
-		//G forbinder slut i testarc med start i kandidat arc.
-
-		//TODO Inner angles
-		//
-
-		//TODO Tangent Error
-		//TODO Line           BEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM
+	//Find ellipses....
+	for(std::vector<ExtendedArc>::iterator itr = extendedArcs.begin(); itr != extendedArcs.end() ; ++itr){
+		std::vector<int> indices;
+		std::vector<Arc*>::iterator resetPos = itr->arcs.end();
+		for(std::vector<ExtendedArc>::iterator itr2 = itr + 1; itr2 != extendedArcs.end() ; ++itr2){
+				if(itr->arcs.back() == itr2->arcs.front()){
+					itr->arcs.push_back(itr2->arcs[1]);
+					itr->arcs.push_back(itr2->arcs[2]);
+				}else if(itr->arcs.back() == itr2->arcs[1]){
+					itr->arcs.push_back(itr2->arcs[2]);
+				}
+				if(resetPos != itr->arcs.end()){
+					if(!canBeMerged(itr->arcs)){
+						itr->arcs.erase(resetPos, itr->arcs.end());
+					}
+					else
+					{
+						extendedArcs.erase(itr2);
+					}
+				}
+		}
+		if(itr->arcs.size() > 3){
+			almostEllipse.push_back(*itr);
+			extendedArcs.erase(itr);
+		}
+	}
+	for(std::vector<ExtendedArc>::iterator itr = extendedArcs.begin(); itr != extendedArcs.end() ; ++itr){
+		for(std::vector<ExtendedArc>::iterator itr2 = almostEllipse.begin(); itr2 != almostEllipse.end() ; ++itr2){
+			std::vector<Arc*>::iterator resetPos = itr2->arcs.end();
+			itr2->arcs.insert(itr2->arcs.begin(), itr->arcs.begin(), itr->arcs.end());
+			if(!canBeMerged(itr2->arcs)){
+				itr2->arcs.erase(resetPos, itr2->arcs.end());
+			}else
+			{
+				extendedArcs.erase(itr);
+			}
+		}
 	}
 
+	for(std::vector<ExtendedArc>::iterator itr = extendedArcs.begin(); itr != extendedArcs.end() ; ++itr){
+		for(std::vector<ExtendedArc>::iterator itr2 = itr+1; itr2 != extendedArcs.end() ; ++itr2){
+			float centerCheck, axis1Check, axis2Check;
+			centerCheck = sqrt(pow((itr->position.x - itr2->position.x), 2) + pow((itr->position.y - itr->position.y), 2));
+			axis1Check = itr->a / itr2->a;
+			axis2Check = itr->b / itr2->b;
 
-
-
+			if(centerCheck < 2 && axis1Check > 0,75 && axis2Check > 0,75){
+				itr->arcs.insert(itr->arcs.end(), itr2->arcs.begin(), itr2->arcs.end());
+				almostEllipse.push_back(*itr);
+				extendedArcs.erase(itr);
+				extendedArcs.erase(itr2);
+			}
+		}
+	}
+	const float circumfanceTolerance = 100;
+	std::vector<Ellipse> ellipses;
+	for(std::vector<ExtendedArc>::iterator itr = almostEllipse.begin(); itr != almostEllipse.end() ; ++itr){
+		Ellipse e = fitEllipse(itr->arcs.data(), itr->arcs.size());
+		float cj = M_PI*(1.5*(e.a + e.b) - sqrt(e.a*e.b));
+		if(cj > circumfanceTolerance){
+			ellipses.push_back(e);
+		}
+	}
+	return ellipses;
 }
 
 
