@@ -51,6 +51,7 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    RingData.msg
+   
  )
 
 ## Generate services in the 'srv' folder
@@ -72,6 +73,7 @@ find_package(catkin REQUIRED COMPONENTS
    DEPENDENCIES
    std_msgs
    ring_detector
+   tum_ardrone
  )
 
 ################################################

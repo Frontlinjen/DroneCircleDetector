@@ -5,6 +5,7 @@
 #include <condition_variable>
 #include <mutex>
 #include "ros/ros.h"
+#include <tum_ardrone/filter_state.h>
 
 class RingEstimation{
 	std::deque<CircleScanResult*> m_CircleResults;
@@ -15,6 +16,7 @@ class RingEstimation{
 	ros::Subscriber subscriber;
 	RingBucket m_Bucket;
 	bool m_Running;
+	float x, y;
 public:
 
 	//Called from thread 1
@@ -23,5 +25,6 @@ public:
 	void Recieve(QRScanResult* result);
 	RingEstimation(ros::NodeHandle n);
 	void Run();
+	void UpdatePosition(tum_ardrone::filter_state msg);
 	void inline ProcessImage(CircleScanResult* circles, QRScanResult* QR);
 };

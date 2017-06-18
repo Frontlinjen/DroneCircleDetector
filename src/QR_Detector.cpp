@@ -69,14 +69,14 @@ void QR_Detector::ProcessImage(const Resource<cv_bridge::CvImageConstPtr> resour
 		}
 
 		float pixelLength = distance * 0.22;
-		float abs_centerX = r.center;
+		float abs_centerX = r.center.x;
 		float abs_distance = distance;
-		if(r.center > 320){
-			abs_centerX = ((r.center - 320) * pixelLength) / 100;
+		if(r.center.x > 320.0){
+			abs_centerX = ((r.center.x - 320.0) * pixelLength) / 100;
 
 		}
-		if(r.center < 320){
-			abs_centerX = ((320 - r.center) * pixelLength) / 100;
+		if(r.center.x < 320.0){
+			abs_centerX = ((320.0 - r.center.x) * pixelLength) / 100;
 		}
 		abs_distance = sqrt((pow(distance, 2) + pow(abs_centerX, 2)));
 

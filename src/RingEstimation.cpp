@@ -1,13 +1,20 @@
 #include "ring_detector/RingEstimation.h"
 #include "ros/ros.h"
 #include "std_msgs/String.h"
-#include <ring_detector/RingData.h>
+#include "ring_detector/MessageFormats.h"
+#include "ring_detector/RingData.h"
 
 RingEstimation::RingEstimation(ros::NodeHandle n){
+	subscriber = n.subscribe<tum_ardrone::filter_state>("/ardrone/predictedPose", 1000, &RingEstimation::UpdatePosition, this);
 	publisher = n.advertise<ring_detector::RingData>("circleData", 1000);
 	ros::Rate loop_rate(10);
 }
 
+void RingEstimation::UpdatePosition(tum_ardrone::filter_state msg){
+	x = msg.x;
+	y = msg.y;
+	printf("%s %f \n%s %f","x: ", x,"y: ", y);
+}
 
 void RingEstimation::Recieve(CircleScanResult* result){
 	{
