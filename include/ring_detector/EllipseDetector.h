@@ -84,7 +84,7 @@ struct Arc{
 
 
 struct ExtendedArc{
-	Arc* arcs[3];
+	std::vector<Arc*> arcs;
 	Vec2 position;
 	float a;
 	float b;
@@ -95,9 +95,9 @@ struct ExtendedArc{
 
 class EllipseDetector{
   typedef std::vector<cv::Vec4i> LineContainer;
-
+  static bool canBeMerged(std::vector<Arc*> arcs);
  public:
-  static std::vector<Arc> detect(const LineContainer  lines);
+  static std::vector<Ellipse> detect(const LineContainer  lines);
   static void generateLines(const LineContainer& lines, std::vector<Line> (& lineSegments)[4], kdTree::PointContainer (& startPoints)[4]);
   static std::vector<Arc>* extractArcs(std::vector<Line> (& lineSegments)[4], kdTree::PointContainer (& startPoints)[4]);
   static std::vector<ExtendedArc> extractExtendedArcs(std::vector<Arc>* arcs);
