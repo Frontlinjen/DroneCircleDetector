@@ -3,13 +3,9 @@
 #include "std_msgs/String.h"
 #include <ring_detector/RingData.h>
 
-RingEstimation::RingEstimationPublisher(ros::NodeHandle n){
+RingEstimation::RingEstimation(ros::NodeHandle n){
 	publisher = n.advertise<ring_detector::RingData>("circleData", 1000);
 	ros::Rate loop_rate(10);
-}
-
-RingEstimation::RingEstimationLitener(ros::NodeHandle n){
-	subscriber = n.advertise<ring_detector::RingData>("circleData", 1000);
 }
 
 
