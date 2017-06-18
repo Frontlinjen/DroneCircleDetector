@@ -7,6 +7,7 @@
 #include "ros/ros.h"
 #include <tum_ardrone/filter_state.h>
 
+
 class RingEstimation{
 	std::deque<CircleScanResult*> m_CircleResults;
 	std::deque<QRScanResult*> m_ScanResults;
@@ -16,7 +17,7 @@ class RingEstimation{
 	ros::Subscriber subscriber;
 	RingBucket m_Bucket;
 	bool m_Running;
-	float x, y;
+	float drone_x, drone_y;
 public:
 
 	//Called from thread 1
