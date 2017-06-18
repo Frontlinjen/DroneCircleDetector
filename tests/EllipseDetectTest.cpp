@@ -12,21 +12,8 @@
 #include <iostream>
 #include <opencv2/core/types.hpp>
 
-void printImage(const cv::Mat& in){
-
-    cv::Mat image = cv::imread("/home/flamingo/Desktop\Ellipse.png", 0);
-    cv::namedWindow("loadingTest", CV_WINDOW_NORMAL);
-    if(image.empty()){
-        std::cout << "!!! Failed imread(): image not found" << std::endl;
-    }
-
-    cv::imshow("loadingTest", in);
-    cv::waitKey(0);
-}
-
-
 TEST(EllipseTest, canDetectEllipse){
-    cv::Mat image = cv::imread("/home/flamingo/Desktop\Ellipse.png", 0);
+    cv::Mat image = cv::imread("/home/flamingo/Desktop/ellipser.png", 0);
     cv::namedWindow("test1", CV_WINDOW_NORMAL);
     if(image.empty()){
         std::cout << "!!! Failed imread(): image not found" << std::endl;
@@ -44,15 +31,16 @@ TEST(EllipseTest, canDetectEllipse){
     //std::cout << "Number of generated lines: " << lineSegments[0].size() + lineSegments[1].size() + lineSegments[2].size() + lineSegments[3].size() << std::endl;
 
     //Tester hvilke arcs der findes
-    std::vector<Arc> extractedArcs;
+    std::vector<Arc>* extractedArcs;
     extractedArcs = EllipseDetector::extractArcs(lineSegments, startPoints);
 
     //std::cout << "Number of extractedArcs: " << extractedArcs.size() << " should be less than generateLines(" << generateLines.size() << ")" << std::endl;
-    for(int i = 0; i < extractedArcs.size(); i++){
-        for(int j = 0; j < extractedArcs[i].lines->size(); j++);
-            cv::Point pt1(extractedArcs[i].lines[j].start.x, extractedArcs[i].lines[j].start.y);
-            cv::Point pt2(extractedArcs[i].lines[j].end.x, extractedArcs[i].lines[j].end.y);
+    for(std::vector<Arc>::iterator i = extractedArcs->begin() ; i != extractedArcs->end(); ++i){
+        for(std::vector<Line>::iterator j = i->lines->begin() ; j != i->lines->end(); ++j){
+        	cv::Point pt1(j->start.x, j->start.y);
+            cv::Point pt2(j->end.x, j->end.y);
             cv::line(image, pt1, pt2, cv::Scalar(255,0,0), 1, cv::LINE_8);
+        }
     }
     cv::namedWindow("ExtractedArcs", CV_WINDOW_NORMAL);
 
@@ -61,15 +49,15 @@ TEST(EllipseTest, canDetectEllipse){
     extendedArcs = EllipseDetector::extractExtendedArcs(extractedArcs);
 
     //std::cout << "Number of extendedArcs: " << extendedArcs.size() << " should be less than extractedArcs (" << extractedArcs.size() << ")" << std::endl;
-    /*for(int i = 0; i < extendedArcs.size(); i++){
-        for(int j = 0; j < extendedArcs.arcs.size(); j++){
-            for(int k = 0; k < extendedArcs.arcs[j].lines.size(); k++){
-                cv::Point pt1(extendedArcs[i].arcs[j]->lines[k].start.x, extendedArcs[i].arcs[j]->lines[k].start.y);
-                cv::Point pt2(extendedArcs[i].arcs[j]->lines[k].end.x, extendedArcs[i].arcs[j]->lines[k].end.y);
+    for(std::vector<ExtendedArc>::iterator i = extendedArcs.begin() ; i != extendedArcs.end(); ++i){
+        for(std::vector<Arc*>::iterator j = i->arcs.begin() ; j != i->arcs.end(); ++j){
+            for(std::vector<Line>::iterator k = (*j)->lines->begin() ; k != (*j)->lines->end(); ++k){
+            	cv::Point pt1(k->start.x, k->start.y);
+            	cv::Point pt2(k->end.x, k->end.y);
                 cv::line(image, pt1, pt2, cv::Scalar(255,0,0), 1, cv::LINE_8);
             }
         }
-    }*/
+    }
     cv::namedWindow("ExtendedArcs", CV_WINDOW_NORMAL);
 
     //Tester hvilke ellipser der findes
