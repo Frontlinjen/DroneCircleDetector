@@ -17,7 +17,7 @@ class RingEstimation{
 	ros::Subscriber subscriber;
 	RingBucket m_Bucket;
 	bool m_Running;
-	float drone_x, drone_y, drone_yaw;
+	float drone_x, drone_y, drone_yaw, drone_z;
 public:
 
 	//Called from thread 1

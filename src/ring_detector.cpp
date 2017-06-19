@@ -77,7 +77,7 @@ void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> res
 
     //Circle detection
     //cv::cvtColor(hueMask, hueMask, CV_BGR2GRAY);
-    	cv::GaussianBlur(hueMask, hueMask, cv::Size(9, 9), 1, 1, cv::BORDER_DEFAULT );
+    cv::GaussianBlur(hueMask, hueMask, cv::Size(9, 9), 1, 1, cv::BORDER_DEFAULT );
 	/*cv::Sobel(droneFeed, grad_x, CV_32FC1, 1, 0, 3);
 	convertScaleAbs( grad_x, abs_grad_x );
 	convertScaleAbs( grad_y, abs_grad_y );
@@ -122,11 +122,6 @@ void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> res
 			data->x = abs_centerX;
 			data->y = distance;
 			data->distance = abs_distance;
-
-			printf("%s %.2f \n","X center", center.x);
-			printf("%s%.2f \n","Ring-distance ", distance);
-			printf("%s%.2f \n","b-length ", abs_centerX);
-			printf("%s%.2f \n","abs_Ring-Distance ", abs_distance);
 
 		}
 	}

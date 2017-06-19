@@ -3,8 +3,8 @@
 typedef unsigned long FrameID;
 
 struct CircleData{
-  unsigned int x, y;
-  unsigned int radius;
+  float x, y;
+  float radius;
   float angle;
   float distance;
 };
