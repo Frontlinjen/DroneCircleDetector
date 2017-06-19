@@ -26,6 +26,19 @@ typedef ScanResult<CircleData> CircleScanResult;
 typedef ScanResult<QRData> QRScanResult;
 
 struct RingDataInternal{
+	RingDataInternal(){
+		ring_number = 0;
+		delta_x = 0;
+		delta_y = 0;
+		delta_z = 0;
+		abs_x = 0;
+		abs_y = 0;
+		abs_z = 0;
+		distance = 0;
+		lastBroadcastAccuracy = 0.50;
+		QRViewCount = 0;
+		ringViewCount = 0;
+	}
   float GetAccuracy(){
 	  return (0.01*ringViewCount + 0.1*QRViewCount) / (0.01*ringViewCount + 0.1*QRViewCount + 10);
   }
