@@ -78,13 +78,13 @@ void QR_Detector::ProcessImage(const Resource<cv_bridge::CvImageConstPtr> resour
 		if(r.center.x < 320.0){
 			abs_centerX = ((320.0 - r.center.x) * pixelLength) / 100;
 		}
-		abs_distance = sqrt((pow(distance, 2) + pow(abs_centerX, 2)));
+		abs_distance = sqrt((pow(distance, 2) + pow(abs_centerX, 2)))/100;
 
 		std::cout << "QR-Distance: " << distance << std::endl;
 		data->angle = r.angle;
 		data->distance = abs_distance;
-		data->x = r.center.x;
-		data->y = r.center.y;
+		data->x = abs_centerX;
+		data->y = abs_distance;
 
 
 	}
