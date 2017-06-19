@@ -26,14 +26,18 @@ typedef ScanResult<CircleData> CircleScanResult;
 typedef ScanResult<QRData> QRScanResult;
 
 struct RingDataInternal{
+  float GetAccuracy(){
+	  return (0.01*ringViewCount + 0.1*QRViewCount) / (0.01*ringViewCount + 0.1*QRViewCount + 10);
+  }
   char ring_number; //The ring number, if known. Calculated from QR
   float delta_x, delta_y, delta_z; //The rings position relative to the camera
   float abs_x, abs_y, abs_z; //The rings position in world coordinates.
   float norm_x, norm_y; //The direction of the ring
   float distance;
-  float accuracy; //Percentage chance of a ring is at the given coordinates
+  float lastBroadcastAccuracy;
   unsigned long timestamp;
-  unsigned long viewcount;
+  unsigned long ringViewCount;
+  unsigned long QRViewCount;
 };
 
 struct RingDataUpdate{

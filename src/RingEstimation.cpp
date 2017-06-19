@@ -2,7 +2,8 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "ring_detector/MessageFormats.h"
-#include "ring_detector/RingData.h"
+#include <ring_detector/RingData.h>
+
 
 RingEstimation::RingEstimation(ros::NodeHandle n){
 	subscriber = n.subscribe<tum_ardrone::filter_state>("/ardrone/predictedPose", 1000, &RingEstimation::UpdatePosition, this);
@@ -65,76 +66,81 @@ void RingEstimation::Run(){
 }
 
 void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
+	if(circles != NULL)
+		{
+			for(std::vector<CircleData>::iterator itr = circles->objects.begin(); itr != circles->objects.end(); ++itr){
+				RingDataInternal *ringData = new RingDataInternal();
 
-	//CircleData *Circledata = new CircleData();
-	QRData *QRdata = new QRData();
-	RingDataInternal *ringData = new RingDataInternal();
-	//time_t timev;
-	ring_detector::RingData data;
-	if(circles == NULL){
+				//calulating absoulte x and y for the ring
+				float cathetusA = sin(drone_yaw) * itr->distance;
+				float cathetusB = cos(drone_yaw) * itr->distance;
+				ringData->abs_x = (drone_x - itr->x) + cathetusA;
+				ringData->abs_y = (drone_y - itr->y) + cathetusB;
+
+				if(ringData->abs_x >= grid_height || ringData->abs_y >= grid_width){
+							delete ringData;
+							continue;
+				}
+
+				RingBucketContainer * bucket = m_Bucket.Get(ringData->abs_x, ringData->abs_y);
+				if(bucket->empty()){
+					m_Bucket.Insert(ringData);
+					ringData->ringViewCount = 1;
+				}
+				else{
+					bucket->front()->ringViewCount += 1;
+					delete ringData;
+				}
+			}
+		}
+	if(QR != NULL){
 		for(std::vector<QRData>::iterator itr = QR->objects.begin(); itr != QR->objects.end(); ++itr){
-			data.delta_x = 0;
-			data.delta_y = itr->distance;
-			data.delta_z = 0.60; //Skal reestimeres
-
-
+			RingDataInternal *ringData = new RingDataInternal();
 			//calulating absoulte x and y for the ring
 			float cathetusA = sin(drone_yaw) * itr->distance;
 			float cathetusB = cos(drone_yaw) * itr->distance;
-			ringData->abs_x = (drone_x - data.delta_x) + cathetusA;
-			ringData->abs_y = (drone_y - data.delta_y) + cathetusB;
+			ringData->abs_x = (drone_x - itr->x) + cathetusA;
+			ringData->abs_y = (drone_y - itr->y) + cathetusB;
 
-			if(m_Bucket.Get(ringData->abs_x, ringData->abs_y)->empty()){
+			if(ringData->abs_x >= grid_height || ringData->abs_y >= grid_width){
+				delete ringData;
+				continue;
+			}
+			RingBucketContainer * bucket = m_Bucket.Get(ringData->abs_x, ringData->abs_y);
+			if(bucket->empty()){
 				m_Bucket.Insert(ringData);
-				ringData->viewcount = 1;
-				ringData->accuracy = 0.0;
+				ringData->QRViewCount = 1;
 				ringData->ring_number = itr->ring_number;
 			}
-			//Example on our accuracy estimation
-			else
-				ringData->viewcount = ringData->viewcount + 1;
-			ringData->accuracy = ringData->accuracy + 15;
-			if(ringData->accuracy >=65)
-				publisher.publish(data);
-
+			else{
+				bucket->front()->QRViewCount++;
+				delete ringData;
+			}
 		}
 	}
-	else
-	{
-		for(std::vector<CircleData>::iterator itr = circles->objects.begin(); itr != circles->objects.end(); ++itr){
-			data.delta_x = 0; //bredde
-			data.delta_y = itr->distance; //Fremad
-			data.delta_z = 0; //Højde
+	for(size_t x = 0; x < grid_height ; ++x){
+		for(size_t y = 0; y < grid_height ; ++y){
+			RingBucketContainer* bucket = m_Bucket.Get(x,  y);
+			for(RingBucketContainer::iterator itr = bucket->begin(); itr != bucket->end(); ++itr){
+				float accuracy = (*itr)->GetAccuracy();
+				if((*itr)->lastBroadcastAccuracy < accuracy){
 
-			//calulating absoulte x and y for the ring
-			float cathetusA = sin(drone_yaw) * itr->distance;
-			float cathetusB = cos(drone_yaw) * itr->distance;
+					ring_detector::RingData d;
+					d.ring_number = (*itr)->ring_number;
+					d.delta_x = (*itr)->delta_x;
+					d.delta_y = (*itr)->delta_y;
+					d.delta_z = (*itr)->delta_z;
+					d.abs_x = (*itr)->abs_x;
+					d.abs_y = (*itr)->abs_y;
+					d.abs_z = (*itr)->abs_z;
+					d.norm_x = (*itr)->norm_x;
+					d.norm_y = (*itr)->norm_y;
+					d.possibility = accuracy;
 
-			ringData->abs_x = (drone_x - ringData->delta_x) + cathetusA;
-			ringData->abs_y = (drone_y - ringData->delta_y) + cathetusB;
-
-			//calculating if the ring/QR code are within same area
-			float i_x = ringData->abs_x - QRdata->x;
-			float i_y = ringData->abs_y - QRdata->y;
-			if(i_x <=1 && i_x >= -1 && i_y <=1 && i_y >= -1){
-				ringData->ring_number = QRdata->ring_number;
-				ringData->distance = QRdata->distance;
+					publisher.publish(d);
+					(*itr)->lastBroadcastAccuracy = accuracy;
+				}
 			}
-			//ringData->timestamp = std::time(&timev);
-			if(m_Bucket.Get(ringData->abs_x, ringData->abs_y)->empty()){
-				m_Bucket.Insert(ringData);
-				ringData->viewcount = 1;
-				ringData->accuracy = 0.0;
-			}
-			//Example on our accuracy estimation
-			else
-				ringData->viewcount = ringData->viewcount + 1;
-			ringData->accuracy = ringData->accuracy + 1;
-			if(ringData->accuracy >=65)
-				publisher.publish(data);
-			//publisher.publish(data);
 		}
 	}
-	delete circles;
-	delete QR;
 }

@@ -119,8 +119,8 @@ void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> res
 			CircleData * data = &circleResult->objects.back();
 			data->radius = radius;
 			data->angle = 0;
-			data->x = center.x;
-			data->y = center.y;
+			data->x = abs_centerX;
+			data->y = distance;
 			data->distance = abs_distance;
 
 			printf("%s %.2f \n","X center", center.x);
