@@ -135,7 +135,7 @@ void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
 				existing->delta_x = ringData->delta_x;
 				existing->delta_y = ringData->delta_y;
 				existing->delta_z = ringData->delta_z;
-
+				existing->ring_number = itr->ring_number;
 				existing->abs_x = (existing->abs_x + ringData->abs_x)*0.5;
 				existing->abs_y = (existing->abs_y + ringData->abs_y)*0.5;
 				existing->abs_z = (existing->abs_z + ringData->abs_z)*0.5;
