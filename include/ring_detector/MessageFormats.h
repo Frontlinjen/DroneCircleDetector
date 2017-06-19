@@ -35,7 +35,7 @@ struct RingDataInternal{
 		abs_y = 0;
 		abs_z = 0;
 		distance = 0;
-		lastBroadcastAccuracy = 0.50;
+		lastBroadcastAccuracy = 0.25;
 		QRViewCount = 0;
 		ringViewCount = 0;
 	}
