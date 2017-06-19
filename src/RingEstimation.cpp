@@ -77,8 +77,8 @@ void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
 				//calulating absoulte x and y for the ring
 				float cathetusA = sin(drone_yaw) * itr->distance;
 				float cathetusB = cos(drone_yaw) * itr->distance;
-				ringData->abs_x = (drone_x - itr->x) + cathetusA;
-				ringData->abs_y = (drone_y - itr->y) + cathetusB;
+				ringData->abs_x = std::abs((drone_x - itr->x) + cathetusA);
+				ringData->abs_y = std::abs((drone_y - itr->y) + cathetusB);
 
 				if(ringData->abs_x >= grid_height || ringData->abs_y >= grid_width){
 							delete ringData;
@@ -116,8 +116,8 @@ void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
 			ringData->delta_z = drone_z;
 			float cathetusA = sin(drone_yaw) * itr->distance;
 			float cathetusB = cos(drone_yaw) * itr->distance;
-			ringData->abs_x = (drone_x - itr->x) + cathetusA;
-			ringData->abs_y = (drone_y - itr->y) + cathetusB;
+			ringData->abs_x = std::abs((drone_x - itr->x) + cathetusA);
+			ringData->abs_y = std::abs((drone_y - itr->y) + cathetusB);
 
 			if(ringData->abs_x >= grid_height || ringData->abs_y >= grid_width){
 				delete ringData;
