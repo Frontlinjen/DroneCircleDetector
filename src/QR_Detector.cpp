@@ -53,21 +53,6 @@ void QR_Detector::ProcessImage(const Resource<cv_bridge::CvImageConstPtr> resour
 			distance = (widthRing * constantRing) / pixels;
 		}
 
-		if(itr->get_data().at(0) == 'w' || itr->get_data().at(0) == 'W'){
-			std::cout << "The QR code is a wall! Which belongs to the ";
-			distance = (widthWall * constantWall) / pixels;
-			switch(itr->get_data().at(2)){
-			case 0 : std::cout << "north wall" << std::endl;
-			break;
-			case 1 : std::cout << "east wall" << std::endl;
-			break;
-			case 2 : std::cout << "south wall" << std::endl;
-			break;
-			case 3 : std::cout << "west wall" << std::endl;;
-			break;
-			}
-		}
-
 		float pixelLength = distance * 0.22;
 		float abs_centerX = r.center.x;
 		float abs_distance = distance;

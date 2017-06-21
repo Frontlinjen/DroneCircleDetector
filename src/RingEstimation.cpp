@@ -68,45 +68,45 @@ void RingEstimation::Run(){
 
 void RingEstimation::ProcessImage(CircleScanResult* circles, QRScanResult* QR){
 	if(circles != NULL)
-		{
-			for(std::vector<CircleData>::iterator itr = circles->objects.begin(); itr != circles->objects.end(); ++itr){
-				RingDataInternal *ringData = new RingDataInternal();
-				ringData->delta_x = itr->x;
-				ringData->delta_y = itr->distance;
-				ringData->abs_z = drone_z;
-				//calulating absoulte x and y for the ring
-				float cathetusA = sin(drone_yaw) * itr->distance;
-				float cathetusB = cos(drone_yaw) * itr->distance;
-				ringData->abs_x = std::abs((drone_x - itr->x) + cathetusA);
-				ringData->abs_y = std::abs((drone_y - itr->y) + cathetusB);
+	{
+		for(std::vector<CircleData>::iterator itr = circles->objects.begin(); itr != circles->objects.end(); ++itr){
+			RingDataInternal *ringData = new RingDataInternal();
+			ringData->delta_x = itr->x;
+			ringData->delta_y = itr->distance;
+			ringData->abs_z = drone_z;
+			//calulating absoulte x and y for the ring
+			float cathetusA = sin(drone_yaw) * itr->distance;
+			float cathetusB = cos(drone_yaw) * itr->distance;
+			ringData->abs_x = std::abs((drone_x - itr->x) + cathetusA);
+			ringData->abs_y = std::abs((drone_y - itr->y) + cathetusB);
 
-				if(ringData->abs_x >= grid_height || ringData->abs_y >= grid_width){
-							delete ringData;
-							continue;
-				}
+			if(ringData->abs_x >= grid_height || ringData->abs_y >= grid_width){
+				delete ringData;
+				continue;
+			}
 
-				RingBucketContainer * bucket = m_Bucket.Get(ringData->abs_x, ringData->abs_y);
-				if(bucket->empty()){
-					m_Bucket.Insert(ringData);
-					ringData->ringViewCount = 1;
-				}
-				else{
-					RingDataInternal *existing = new RingDataInternal();
-					existing = bucket->front();
-					existing->delta_x = ringData->delta_x;
-					existing->delta_y = ringData->delta_y;
-					existing->delta_z = ringData->delta_z;
+			RingBucketContainer * bucket = m_Bucket.Get(ringData->abs_x, ringData->abs_y);
+			if(bucket->empty()){
+				m_Bucket.Insert(ringData);
+				ringData->ringViewCount = 1;
+			}
+			else{
+				RingDataInternal *existing = new RingDataInternal();
+				existing = bucket->front();
+				existing->delta_x = ringData->delta_x;
+				existing->delta_y = ringData->delta_y;
+				existing->delta_z = ringData->delta_z;
 
-					existing->abs_x = (existing->abs_x + ringData->abs_x)*0.5;
-					existing->abs_y = (existing->abs_y + ringData->abs_y)*0.5;
-					existing->abs_z = (existing->abs_z + ringData->abs_z)*0.5;
-					existing->distance = ringData->distance;
-					existing->ringViewCount++;
-					delete ringData;
+				existing->abs_x = (existing->abs_x + ringData->abs_x)*0.5;
+				existing->abs_y = (existing->abs_y + ringData->abs_y)*0.5;
+				existing->abs_z = (existing->abs_z + ringData->abs_z)*0.5;
+				existing->distance = ringData->distance;
+				existing->ringViewCount++;
+				delete ringData;
 
-				}
 			}
 		}
+	}
 	if(QR != NULL){
 		for(std::vector<QRData>::iterator itr = QR->objects.begin(); itr != QR->objects.end(); ++itr){
 			RingDataInternal *ringData = new RingDataInternal();

@@ -10,7 +10,7 @@ ring ThomasAlgorithm::thomasAlgorithm(std::vector<float> x, std::vector<float> v
 	float sumxy = 0;
 	float sumx2y = 0;
 	float sumxy2 = 0;
-	
+
 	for(int i = 0; i < x.size(); i++){
 		sumx = sumx + x[i];
 		sumx2 = sumx2 + pow(x[i], 2);
@@ -22,7 +22,7 @@ ring ThomasAlgorithm::thomasAlgorithm(std::vector<float> x, std::vector<float> v
 		sumx2y = sumx2y + (pow(x[i], 2) * v[i];
 		sumxy2 = sumxy2 + (x[i] * pow(v[i], 2));
 	}
-	
+
 	float a1, b1, c1, a2, b2, c2, x1, y, R, temp;
 	a1 = 2(pow(sumx, 2) - (x.size() * sumx2));
 	b1 = 2((sumx * sumy) - (x.size * sumxy);

@@ -99,33 +99,33 @@ std::vector<Arc> EllipseDetector::detect(const LineContainer lines){
 			leaf.p = kdPoint { l.start.x, l.start.y };
 			leaf.userdata = static_cast<void*>(&lineSegments.back());
 			slope = (l.end.y - l.start.y) / (l.end.x - l.start.x)
-			if(slope <= 0,5 && slope >= -0,5){
-				lineSegments[0].push_back(l);
-				startPoints[0].push_back(leaf);
-			}
-			else if(slope > 0,5 && slope <= 1){
-				lineSegments[3].push_back(l);
-				startPoints[3].push_back(leaf);
-			}
-			else if(slope < -0,5 && slope > -1){
-				lineSegments[2].push_back(l);
-				startPoints[2].push_back(leaf);
-			}
-			else{
-				slope = (l.end.x - l.start.x)/(l.end.y - l.start.x)
-				if(slope <= 0,5 && slope >= -0,5){
-					lineSegments[1].push_back(l);
-					startPoints[1].push_back(leaf);
-				}
-				else if(slope > 0,5 && slope <= 1){
-					lineSegments[2].push_back(l);
-					startPoints[2].push_back(leaf);
-				}
-				else if(slope < -0,5 && slope > -1){
-					lineSegments[3].push_back(l);
-					startPoints[3].push_back(leaf);
-				}
-			}
+					if(slope <= 0,5 && slope >= -0,5){
+						lineSegments[0].push_back(l);
+						startPoints[0].push_back(leaf);
+					}
+					else if(slope > 0,5 && slope <= 1){
+						lineSegments[3].push_back(l);
+						startPoints[3].push_back(leaf);
+					}
+					else if(slope < -0,5 && slope > -1){
+						lineSegments[2].push_back(l);
+						startPoints[2].push_back(leaf);
+					}
+					else{
+						slope = (l.end.x - l.start.x)/(l.end.y - l.start.x)
+						if(slope <= 0,5 && slope >= -0,5){
+							lineSegments[1].push_back(l);
+							startPoints[1].push_back(leaf);
+						}
+						else if(slope > 0,5 && slope <= 1){
+							lineSegments[2].push_back(l);
+							startPoints[2].push_back(leaf);
+						}
+						else if(slope < -0,5 && slope > -1){
+							lineSegments[3].push_back(l);
+							startPoints[3].push_back(leaf);
+						}
+					}
 			++itr;
 		}
 	}
@@ -158,30 +158,30 @@ std::vector<Arc> EllipseDetector::detect(const LineContainer lines){
 					Line * candidate = static_cast<Line*>(cItr->userdata);
 
 					float intersectingAngle = std::abs(startLine->angle - candidate->angle);
-						if(intersectingAngle > 0 && intersectingAngle < 45){
-							//Calculating error
-								std::vector<float> xs;
-								std::vector<float> ys;
+					if(intersectingAngle > 0 && intersectingAngle < 45){
+						//Calculating error
+						std::vector<float> xs;
+						std::vector<float> ys;
 
-								for(std::vector<Line>::iterator candidateLine = arcCandidate->begin();candidateLine != arcCandidate->end(); ++candidateLine){
-									xs.push_back(candidateLine->start.x);
-									xs.push_back(candidateLine->end.x);
-									ys.push_back(candidateLine->start.y);
-									ys.push_back(candidateLine->end.y);
-								}
-								xs.push_back(candidate->start.x);
-								xs.push_back(candidate->end.x);
-								ys.push_back(candidate->start.y);
-								ys.push_back(candidate->end.y);
-
-								ring r = ThomasAlgorithm::thomasAlgorithm(xs, ys);
-
-								float estimatedAngle =  TO_DEG(std::atan2(candidate->mid.x - r.centerX, r.centerY - candidate->mid.y));
-								if(std::abs(candidate->angle - estimatedAngle) < errLine){
-									startLine = candidate; //Start iteration using new candidate
-									break;
-								}
+						for(std::vector<Line>::iterator candidateLine = arcCandidate->begin();candidateLine != arcCandidate->end(); ++candidateLine){
+							xs.push_back(candidateLine->start.x);
+							xs.push_back(candidateLine->end.x);
+							ys.push_back(candidateLine->start.y);
+							ys.push_back(candidateLine->end.y);
 						}
+						xs.push_back(candidate->start.x);
+						xs.push_back(candidate->end.x);
+						ys.push_back(candidate->start.y);
+						ys.push_back(candidate->end.y);
+
+						ring r = ThomasAlgorithm::thomasAlgorithm(xs, ys);
+
+						float estimatedAngle =  TO_DEG(std::atan2(candidate->mid.x - r.centerX, r.centerY - candidate->mid.y));
+						if(std::abs(candidate->angle - estimatedAngle) < errLine){
+							startLine = candidate; //Start iteration using new candidate
+							break;
+						}
+					}
 				}
 				//Save if we have more than one candidate
 				if(startLine==NULL && arcCandidate->size() > 1){
@@ -227,7 +227,7 @@ std::vector<Arc> EllipseDetector::detect(const LineContainer lines){
 		//
 
 		//TODO Tangent Error
-		//TODO Line           BEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM
+		//TODO Line
 	}
 
 

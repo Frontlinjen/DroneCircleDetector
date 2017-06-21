@@ -17,7 +17,7 @@
 
 void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> resource)
 {
-  if(resource.resource.get() == NULL)
+	if(resource.resource.get() == NULL)
 		return;
 	if(!initialized)
 	{
@@ -58,26 +58,26 @@ void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> res
 	std::vector<cv::Mat> hsvChannels;
 	//Hue = 0, Saturation = 1, Value = 2
 	cv::split(droneFeed, hsvChannels);
-    cv::Mat hueImage = hsvChannels[0];
-    cv::Mat hueMask;
-    cv::inRange(hueImage, hueValue - hueRange, hueValue + hueRange, hueMask);
-    //Tjek om farven er indenfor vores Huerange*
-    if (hueValue - hueRange < 0 || hueValue + hueRange > 180)
-    {
-    	cv::Mat hueMaskUpper;
-        int upperHueValue = 180 + (hueValue - hueRange);
-        cv::inRange(hueImage, upperHueValue, 180, hueMaskUpper);
-        hueMask = hueMask | hueMaskUpper;
-    }
-    //Vi sortere resten fra
-    cv::Mat saturationMask = hsvChannels[1] > minSaturation;
-    cv::Mat valueMask = hsvChannels[2] > minValue;
-    hueMask = (hueMask & saturationMask) & valueMask;
-    cv::imshow("red", hueMask);
+	cv::Mat hueImage = hsvChannels[0];
+	cv::Mat hueMask;
+	cv::inRange(hueImage, hueValue - hueRange, hueValue + hueRange, hueMask);
+	//Tjek om farven er indenfor vores Huerange*
+	if (hueValue - hueRange < 0 || hueValue + hueRange > 180)
+	{
+		cv::Mat hueMaskUpper;
+		int upperHueValue = 180 + (hueValue - hueRange);
+		cv::inRange(hueImage, upperHueValue, 180, hueMaskUpper);
+		hueMask = hueMask | hueMaskUpper;
+	}
+	//Vi sortere resten fra
+	cv::Mat saturationMask = hsvChannels[1] > minSaturation;
+	cv::Mat valueMask = hsvChannels[2] > minValue;
+	hueMask = (hueMask & saturationMask) & valueMask;
+	cv::imshow("red", hueMask);
 
-    //Circle detection
-    //cv::cvtColor(hueMask, hueMask, CV_BGR2GRAY);
-    cv::GaussianBlur(hueMask, hueMask, cv::Size(9, 9), 1, 1, cv::BORDER_DEFAULT );
+	//Circle detection
+	//cv::cvtColor(hueMask, hueMask, CV_BGR2GRAY);
+	cv::GaussianBlur(hueMask, hueMask, cv::Size(9, 9), 1, 1, cv::BORDER_DEFAULT );
 	/*cv::Sobel(droneFeed, grad_x, CV_32FC1, 1, 0, 3);
 	convertScaleAbs( grad_x, abs_grad_x );
 	convertScaleAbs( grad_y, abs_grad_y );
@@ -89,7 +89,7 @@ void Ring_Detector:: ProcessImage(const Resource<cv_bridge::CvImageConstPtr> res
 	double dminRadius = minRadius / 1.0;
 	double dmaxRadius = maxRadius / 1.0;
 	cv::HoughCircles(hueMask, circles, CV_HOUGH_GRADIENT, 1, minDist, dparam1, dparam2, dminRadius, dmaxRadius);
-        //cvtColor(resource->image, droneFeed, CV_BGR2GRAY); 
+	//cvtColor(resource->image, droneFeed, CV_BGR2GRAY);
 	droneFeed = resource.resource->image;
 	CircleScanResult * circleResult = new CircleScanResult;
 	circleResult->frameID =resource.id;
